@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use chromaverity in research or a publication, please cite it as below."
+title: "chromaverity: checking video color labels against pixels"
+type: software
+authors:
+  - name: "Mezzframe AI open lab"   # ⟨PRO: confirm the legal author/copyright holder⟩
+license: Apache-2.0
+version: 0.1.0.dev0
+url: "https://mezzframe.ai"
+# repository-code: "https://github.com/<org>/chromaverity"
+keywords: [video, color, ffmpeg, broadcast, quality-control, mcp]

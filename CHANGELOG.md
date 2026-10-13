@@ -1,0 +1,17 @@
+# Changelog
+
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [SemVer](https://semver.org/); before 1.0, minor versions may break things and will say so.
+
+## [Unreleased]
+
+### Changed
+- Renamed from the working name `colortruth` to `chromaverity` before first release (colortruth.com is registered and X-Rite's ColorTRUE is a color-calibration app; too close). Finding IDs keep the `CT` prefix, read as "color tag".
+- Mislabel zoo generator is now FFmpeg-version-proof: pixels are made with plain arithmetic (`lutyuv`), labels are written afterwards with `h264_metadata`. FFmpeg 4.4 silently undid `scale=out_range=pc`, which made the old "good full range" clip a real mislabel.
+
+### Added
+- `chromaverity inspect`: label lint (CT101-CT109), range check against pixels (CT300-CT304), proposed fixes.
+- `chromaverity diff`: label changes across a hop (CT201-CT202).
+- `chromaverity mcp`: read-only MCP server with `chromaverity_inspect` and `chromaverity_diff`, limited to `--root`.
+- JSON report, schema 0.1.
+- `scripts/make_zoo.py`: synthetic mislabel zoo v0.1 (7 clips).
+- Educational docs (00-10, glossary, 4 ADRs), CI, gitleaks pre-commit hook.
