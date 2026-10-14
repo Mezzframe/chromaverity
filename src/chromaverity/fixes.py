@@ -23,10 +23,16 @@ from can say. So when both are possible, we propose both and say so.
 Every command uses `-n` (never overwrite) and writes a new file next to the
 original. The original is never touched (Preserve-topic rule: originals stay
 untouched).
+
+Each command is stored as a list (the truth) plus two pasteable texts:
+`command_text` quoted for bash/zsh, and `command_text_powershell` for
+Windows PowerShell. The two shells quote differently, so one string can't
+serve both (docs/install.md section 6).
 """
 
 from __future__ import annotations
 
+import re
 import shlex
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -45,6 +51,31 @@ RETAG_BSF = {"h264": "h264_metadata", "hevc": "hevc_metadata"}
 H273 = {"bt709": 1, "unspecified": 2}
 
 
+# Characters PowerShell reads as plain text in a bare argument. Anything else
+# (space, $ ' " ` ; , ( ) { } @ # & | < > ~ and non-ASCII) gets single quotes.
+# The comma matters: PowerShell reads `fps=1,signalstats` as a two-item array.
+_PS_SAFE = re.compile(r"[A-Za-z0-9_\-+=:./\\]+")
+# PowerShell treats typographic single quotes as quotes too, so all of them
+# have to be doubled inside a single-quoted string.
+_PS_SINGLE_QUOTES = "'\u2018\u2019\u201a\u201b"
+
+
+def powershell_quote(arg: str) -> str:
+    """Quote one argument for PowerShell, the way shlex.quote does for bash."""
+    if arg and _PS_SAFE.fullmatch(arg):
+        return arg
+    return "'" + "".join(c * 2 if c in _PS_SINGLE_QUOTES else c for c in arg) + "'"
+
+
+def powershell_join(cmd: list[str]) -> str:
+    """PowerShell version of shlex.join."""
+    parts = [powershell_quote(a) for a in cmd]
+    if parts and parts[0].startswith("'"):
+        # A quoted program path is just a string to PowerShell; `&` runs it.
+        parts[0] = "& " + parts[0]
+    return " ".join(parts)
+
+
 @dataclass
 class ProposedFix:
     for_finding: str
@@ -60,9 +91,14 @@ class ProposedFix:
         # shlex.join quotes anything with spaces, so the text is safe to paste.
         return shlex.join(self.command)
 
+    @property
+    def command_text_powershell(self) -> str:
+        return powershell_join(self.command)
+
     def as_dict(self) -> dict[str, Any]:
         d = asdict(self)
         d["command_text"] = self.command_text
+        d["command_text_powershell"] = self.command_text_powershell
         return d
 
 
@@ -158,7 +194,7 @@ def propose(src: Path, tags: ColorTags, findings: list[Finding]) -> list[Propose
                     title="Fill blank labels with BT.709 (pixels unchanged)",
                     why="Most HD SDR content is BT.709. Only use this if you know that's what it was made as.",
                     command=cmd,
-                    assumptions=["⟨assumption⟩ the content is HD SDR made in BT.709"],
+                    assumptions=["Assumes the content is HD SDR made in BT.709"],
                 ))
     return fixes
 

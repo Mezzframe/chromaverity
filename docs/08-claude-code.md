@@ -14,7 +14,7 @@ cd chromaverity
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,mcp]"
 git config core.hooksPath .githooks                   # turn on the secret-scan pre-commit hook
-pytest                                                # 36 tests, ~10 s with FFmpeg
+pytest                                                # 40 tests, a few seconds with FFmpeg
 claude                                                # start Claude Code in the repo
 ```
 

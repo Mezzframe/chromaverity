@@ -12,7 +12,7 @@ Because the lie is ours, the ground truth is exact, and we can make as many case
 
 ## v0.1 (today)
 
-`scripts/make_zoo.py OUT_DIR` builds 7 clips from FFmpeg's `testsrc2` with a pure white and a pure black box, plus a `manifest.json` of truth vs label. Tested on FFmpeg 4.4 and 6.1.
+`scripts/make_zoo.py OUT_DIR` builds 7 clips from FFmpeg's `testsrc2` with a pure white and a pure black box, plus a `manifest.json` of truth vs label. Tested in CI on FFmpeg 4.4 and 6.1 (Linux) and 9.0 (macOS, Windows).
 
 | Clip | Pixels | Label | Tests |
 |---|---|---|---|
@@ -24,10 +24,11 @@ Because the lie is ours, the ground truth is exact, and we can make as many case
 | hd_labelled_601 | 709 | 601 matrix | CT102 |
 | hop_dropped_tags | copy of good_limited_709 | primaries/transfer/matrix blanked | CT201 |
 
-Two lessons found while building it, both exactly the kind of silent behavior this tool exists to catch:
+Three lessons found while building it, both exactly the kind of silent behavior this tool exists to catch:
 
 1. **FFmpeg versions disagree about range.** Our first generator used `scale=out_range=pc` to make full-range pixels. On FFmpeg 6.1 that worked. On FFmpeg 4.4 the next filter (`format=yuv420p`) quietly converted the pixels back to limited, so the "good full range" clip was really limited pixels labelled full, and chromaverity flagged it (CT302). The detector was right and our fixture was wrong. The fix: make every clip limited first (all versions agree on that), stretch to full with plain arithmetic (`lutyuv`), and write the label separately with `h264_metadata`. Pixels and label are now set by two independent steps.
 2. **Modern FFmpeg copies range from each frame into the encoder**, so leaving out `-color_range` can still produce a labelled file. We wipe frame tags with `setparams` before encoding so the only label is the one we write on purpose.
+3. **FFmpeg 9 keeps the old label in the container.** Retagging an already-labelled MP4 with `-c copy -bsf:v h264_metadata=...` changes the H.264 header, but FFmpeg 9.0 writes the input's old values into the MP4 `colr` box, and ffprobe reads that. Our `hop_dropped_tags` clip quietly dropped nothing until CI ran on macOS and Windows (which get FFmpeg 9). Now every retag also passes `-color_range` / `-color_primaries` / `-color_trc` / `-colorspace`, so both places agree. See [04](04-cli-anatomy.md#3-retag-fix-fixespy-proposed-only).
 
 ## v0.2 plan: from test set to dataset
 

@@ -59,8 +59,24 @@ def _build_parser() -> argparse.ArgumentParser:
     return p
 
 
+def _never_crash_on_output() -> None:
+    """Print unencodable characters as '?' instead of crashing.
+
+    On Windows, when output goes to a pipe or a file, Python encodes it with
+    the ANSI code page (often cp1252). That can't encode many filenames
+    (クリップ.mp4) and would raise UnicodeEncodeError halfway through a report.
+    Only the human-readable text is affected: --json output is ASCII (json.dumps
+    escapes everything else) and --out always writes UTF-8.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="replace")
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
+    if args.cmd != "mcp":  # the MCP server owns stdout for its protocol; leave it alone
+        _never_crash_on_output()
     try:
         if args.cmd == "mcp":
             from chromaverity.mcp_server import serve  # imported late: optional dependency

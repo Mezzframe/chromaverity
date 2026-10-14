@@ -48,11 +48,19 @@
 
 For files from strangers (issue attachments, scraped media), run inside a throwaway container with no network:
 
+macOS / Linux:
+
 ```bash
 docker run --rm --network none -v "$PWD/inbox:/data:ro" chromaverity:dev inspect /data/file.mp4
 ```
 
-`--network none` removes the network, `:ro` mounts the folder read-only. ⟨should: publish a Dockerfile in v0.2⟩
+Windows PowerShell (Docker Desktop):
+
+```powershell
+docker run --rm --network none -v "${PWD}\inbox:/data:ro" chromaverity:dev inspect /data/file.mp4
+```
+
+`--network none` removes the network, `:ro` mounts the folder read-only. `$PWD` / `${PWD}` is the folder you're in; inside the container the files appear at `/data` on every system, because the container is Linux. ⟨should: publish a Dockerfile in v0.2, so this image exists⟩ ⟨assumption: Windows form not tested⟩
 
 ## Reporting a vulnerability
 

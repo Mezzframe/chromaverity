@@ -5,6 +5,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ## [Unreleased]
 
 ### Fixed
+- Text output could crash on Windows (`UnicodeEncodeError`) when piped or redirected, for any filename outside the console's code page (e.g. `クリップ.mp4`) and for the CT101 fix note. Unencodable characters now print as `?`; JSON and `--out` were never affected.
 - Retag fixes did nothing on FFmpeg 9: the bitstream filter changed the H.264 header, but the MP4 `colr` box kept the input's old values and ffprobe reported the old label. Proposed retag commands now also pass `-color_range` / `-color_primaries` / `-color_trc` / `-colorspace` so the container agrees. The zoo's `hop_dropped_tags` clip had the same problem and is fixed the same way.
 - `test_safety`: shell-characters test no longer assumes POSIX paths.
 
@@ -13,6 +14,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 - Mislabel zoo generator is now FFmpeg-version-proof: pixels are made with plain arithmetic (`lutyuv`), labels are written afterwards with `h264_metadata`. FFmpeg 4.4 silently undid `scale=out_range=pc`, which made the old "good full range" clip a real mislabel.
 
 ### Added
+- Every proposed fix now has `command_text_powershell` next to `command_text` (bash). The text output shows the PowerShell form on Windows (`PS> ...`). New report field, no schema bump. Quoting is tested by round-tripping awkward filenames through real PowerShell.
+- `.gitattributes` (LF line endings everywhere, so the bash pre-commit hook works on Windows) and `.editorconfig`.
+- CI on Windows also follows docs/install.md in PowerShell and cmd.exe, not only Git Bash.
+- CONTRIBUTING "Writing docs for three systems"; PR template checkbox; CLAUDE.md rule.
 - CI now runs on macOS and Windows as well as Ubuntu.
 - `docs/install.md`: setup on macOS, Windows (PowerShell, cmd, Git Bash, WSL2) and Linux (Debian/Ubuntu, Fedora, Arch), shell quoting differences, MCP paths per system, troubleshooting. README, CONTRIBUTING and docs 04/08 now show Windows commands alongside macOS/Linux.
 - `chromaverity inspect`: label lint (CT101-CT109), range check against pixels (CT300-CT304), proposed fixes.

@@ -1,6 +1,8 @@
 # Install and run on macOS, Windows and Linux
 
-chromaverity is plain Python plus the `ffmpeg` and `ffprobe` programs, so it should run anywhere those do. The steps are the same on every system. Only three things change: how you install the tools, how you activate the virtual environment, and how your shell quotes things.
+chromaverity is plain Python plus the `ffmpeg` and `ffprobe` programs, so it runs anywhere those do. The steps are the same on every system. Only three things change: how you install the tools, how you activate the virtual environment, and how your shell quotes things.
+
+The maintainer works on macOS with Homebrew. Everything in this repo (setup, tests, lint, the zoo, the pre-commit hook) is meant to work the same from Windows and Linux, and CI checks it on all three.
 
 ## Where we've actually tested
 
@@ -8,7 +10,7 @@ chromaverity is plain Python plus the `ffmpeg` and `ffprobe` programs, so it sho
 |---|---|---|
 | Linux (Ubuntu 22.04, 24.04) | Full test suite passes | Measured: CI on every push (FFmpeg 4.4 and 6.1) |
 | macOS | Full test suite passes | Measured: CI on every push (`macos-latest`, Homebrew FFmpeg 9.0), and on the maintainer's Mac (FFmpeg 9.0.2) |
-| Windows | Full test suite passes | Measured: CI on every push (`windows-latest`, FFmpeg 9.0 from gyan.dev via Chocolatey). CI runs the commands in Git Bash, so PowerShell and cmd steps below are ⟨assumption⟩ until someone reports back |
+| Windows | Full test suite passes | Measured: CI on every push (`windows-latest`, FFmpeg 9.0 from gyan.dev via Chocolatey). CI runs the test suite in Git Bash, then repeats the PowerShell and cmd setup steps below word for word. Not tested: Windows PowerShell 5.1 (CI uses PowerShell 7) |
 | Windows via WSL2 | Same as Linux ⟨assumption⟩ | WSL2 runs a real Ubuntu, so follow the Linux steps inside it |
 
 Found something that doesn't work on your system? Please [tell us](https://github.com/Novapakt/chromaverity/issues).
@@ -85,6 +87,8 @@ That gives you Ubuntu. Open it and follow the Debian / Ubuntu steps above. Keep 
 
 ## 3. Get the code and set up
 
+**Where to put it:** a plain local folder such as `~/code` (macOS/Linux) or `C:\code` (Windows). Avoid folders that sync to the cloud (iCloud Desktop & Documents, OneDrive's Desktop/Documents, Dropbox). Sync tools fight with the thousands of small files in `.venv`, and on macOS iCloud breaks the install outright (see Troubleshooting).
+
 The commands are the same everywhere except the line that activates the virtual environment.
 
 **macOS / Linux / WSL (bash or zsh):**
@@ -149,7 +153,7 @@ pytest
 
 On macOS and Linux `python` inside an active venv is the venv's Python, so `python` and `python3` both work. Forward slashes in paths work on Windows too, for Python and for chromaverity.
 
-If FFmpeg or libx264 is missing, `pytest` still runs the pure tests and marks the FFmpeg ones as skipped. Check the summary line: `25 passed, 11 skipped` means FFmpeg wasn't found.
+If FFmpeg or libx264 is missing, `pytest` still runs the pure tests and marks the FFmpeg ones as skipped. If the summary line says some were skipped, `pytest -rs` lists each skip and its reason (`-r` = report, `s` = skipped). "ffmpeg/ffprobe with libx264 not available" means FFmpeg wasn't found; "PowerShell 7 (pwsh) not installed" is expected on most Macs and Linux machines.
 
 ## 5. Contributors: the pre-commit hook
 
@@ -161,17 +165,18 @@ This is the same on every system. The hook is a bash script. On Windows, Git for
 
 ## 6. Pasting the proposed fixes
 
-chromaverity prints fix commands for you to review and run. They're quoted for **bash/zsh** (Python's `shlex.join`).
+chromaverity prints fix commands for you to review and run. Shells quote differently, so every fix comes in two versions, and the text output shows the one for your system:
 
-| Shell | Paste as-is? |
-|---|---|
-| bash, zsh, Git Bash, WSL | Yes |
-| PowerShell | Yes for most paths. A filename containing `'` or `$` needs re-quoting ⟨verify⟩ |
-| cmd.exe | Only if no path has spaces. cmd doesn't understand single quotes |
+| You're on | Text output shows | JSON field | Paste into |
+|---|---|---|---|
+| macOS, Linux, WSL | `$ ffmpeg ...` | `command_text` | bash, zsh, Git Bash |
+| Windows | `PS> ffmpeg ...` | `command_text_powershell` | PowerShell |
 
-The longer commands in our docs wrap lines with `\` at the end. That's bash. In PowerShell use a backtick `` ` `` instead, in cmd use `^`, or just put the whole command on one line.
+Both are in every JSON report, whatever system made it. Paste the text after `$ ` or `PS> `, not the prompt itself. Quoting is tested in CI by running awkward filenames (spaces, `'`, `$`, commas, `C:\...`) through real PowerShell and checking every argument arrives intact.
 
-Printing Windows-quoted fixes on Windows is on the [roadmap](../ROADMAP.md).
+**cmd.exe:** we don't print a cmd version. cmd's quoting rules are different again and easy to get wrong. Open PowerShell for fixes (it's the default terminal on Windows 10 and 11), or run `powershell` from cmd first.
+
+The longer commands in our docs wrap lines with `\` at the end. That's bash. In PowerShell use a backtick `` ` `` instead, in cmd use `^`, or put the whole command on one line.
 
 ## 7. The MCP server on each system
 
@@ -196,7 +201,8 @@ More in [08 Claude Code](08-claude-code.md).
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `'ffmpeg' not found on PATH` | FFmpeg isn't installed, or this terminal started before it was | Install it (section 2), then open a new terminal |
-| `No module named 'chromaverity'` on macOS, with the venv active | The editable install's `.pth` file has the macOS "hidden" flag, and recent Python versions skip hidden `.pth` files. Measured on the maintainer's Mac with Python 3.12 and the repo under `~/Desktop`. Check with `ls -lO .venv/lib/python3.*/site-packages/*.pth` (look for `hidden`) | `chflags nohidden .venv/lib/python3.*/site-packages/*.pth` |
+| `No module named 'chromaverity'` on macOS, with the venv active | The repo is in a folder synced by iCloud Drive (Desktop & Documents sync). iCloud marks files in the venv "hidden", and recent Python versions skip hidden `.pth` files, which is how the editable install finds the code. Check with `ls -lO .venv/lib/python3.*/site-packages/*.pth` (look for `hidden`). Measured on the maintainer's Mac, 2026-10-14: `chflags nohidden` is undone by iCloud within seconds | Keep code out of iCloud: move the repo to a folder like `~/code`, then delete and recreate `.venv`. Same advice for OneDrive on Windows ⟨assumption: not measured⟩ |
+| Pre-commit hook fails on Windows with `bash\r: No such file or directory` | The hook was checked out with Windows line endings (CRLF). Our `.gitattributes` prevents this on fresh clones | `git rm --cached -r . -q` then `git reset --hard` to re-checkout with LF. This discards uncommitted changes, so commit or stash first |
 | `zsh: no matches found: .[dev,mcp]` | zsh read the brackets as a filename pattern | Keep the quotes: `".[dev,mcp]"` |
 | PowerShell: "running scripts is disabled" | Execution policy | See the note in section 3 |
 | `python` opens the Microsoft Store | Windows app execution alias | Turn it off, or use `py` |
