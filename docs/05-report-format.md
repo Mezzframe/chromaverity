@@ -15,7 +15,7 @@ The JSON report is the product. The text output and the MCP tool results are vie
 
   // inspect only
   "file": "/abs/path.mp4",
-  "tags": { "color_primaries": "bt709", "color_range": "tv", "bit_depth": 8, ... },
+  "tags": { "color_primaries": "bt709", "color_range": "tv", "bit_depth": 8, ..., "notes": [] },  // notes: reserved, always [] in 0.1
   "proposed_fixes": [ {
       "kind": "retag",
       "command": ["ffmpeg", ...],          // the truth: one list item per argument

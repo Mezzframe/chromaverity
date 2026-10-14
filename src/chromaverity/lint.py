@@ -6,7 +6,7 @@ reason it exists. They are also the part existing tools already cover, so we
 keep them short and spend our effort on the essence layer.
 
 Each rule is a small function. To add one: write it, give it the next free
-CT1xx id, add a test in tests/test_lint.py, and document it in
+CT1xx id, add a test in tests/test_tags_lint_diff.py, and document it in
 docs/06-checks-reference.md.
 """
 

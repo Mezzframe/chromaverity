@@ -24,7 +24,7 @@ from chromaverity.fixes import propose
 from chromaverity.lint import lint
 from chromaverity.probe import read_tags, read_tags_and_duration
 from chromaverity.safety import ToolError, checked_media_path, require_binary, run
-from chromaverity.tags import ColorTags, friendly
+from chromaverity.tags import friendly
 
 
 def parse_ffmpeg_version(first_line: str) -> str | None:
@@ -177,13 +177,16 @@ def _tag_table(t: dict[str, Any]) -> str:
         ("range", friendly(t["color_range"])),
         ("chroma loc", friendly(t["chroma_location"])),
         ("format", f"{t['codec']} {t['width']}x{t['height']} {t['pix_fmt']} ({t['bit_depth']}-bit)"),
-        ("HDR metadata", "mastering display" * t["has_mastering_display"]
-         + (" + " if t["has_mastering_display"] and t["has_content_light_level"] else "")
-         + "content light level" * t["has_content_light_level"] or "none"),
+        ("HDR metadata", _hdr_cell(t)),
     ]
     return "\n".join(f"  {k:<13} {v}" for k, v in rows)
 
 
-def from_tags_only(tags: ColorTags) -> list[Finding]:
-    """Convenience for library users who already have tags (no file access)."""
-    return lint(tags)
+def _hdr_cell(t: dict[str, Any]) -> str:
+    present = []
+    if t["has_mastering_display"]:
+        present.append("mastering display")
+    if t["has_content_light_level"]:
+        present.append("content light level")
+    return " + ".join(present) or "none"
+

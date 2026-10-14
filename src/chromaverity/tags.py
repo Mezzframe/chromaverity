@@ -85,7 +85,8 @@ class ColorTags:
     # first thing a careless transcode drops. We record presence only in v0.1.
     has_mastering_display: bool = False
     has_content_light_level: bool = False
-    # Anything odd we noticed while parsing, kept for the report.
+    # Reserved for parser remarks. Nothing writes it in 0.1, so it's always [],
+    # but it's in every report already and removing a field is a schema break.
     notes: list[str] = field(default_factory=list)
 
     @classmethod
