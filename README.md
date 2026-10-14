@@ -8,7 +8,7 @@ An open tool from the [Mezzframe](https://mezzframe.ai) lab, published from the 
 
 ```
 $ chromaverity inspect zoo/full_pixels_labelled_limited.mp4
-chromaverity 0.1.0.dev0  ·  FFmpeg 9.0.2  ·  zoo/full_pixels_labelled_limited.mp4
+chromaverity 0.1.0  ·  FFmpeg 9.0.2  ·  zoo/full_pixels_labelled_limited.mp4
 
   primaries     BT.709 (HD)
   transfer      BT.709 (HD)

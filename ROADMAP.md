@@ -9,7 +9,8 @@ Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order
 - [x] MCP server, read-only, folder-restricted
 - [x] Synthetic mislabel zoo v0.1 + test suite
 - [x] CI green on GitHub from a clean clone
-- [ ] Tag `v0.1.0`, publish to PyPI ⟨verify name still free⟩
+- [x] Tag `v0.1.0` and publish it as a GitHub release
+- [ ] Publish to PyPI (name `chromaverity` free, checked 2026-10-14; Trusted Publishing needs a one-time setup on pypi.org)
 
 ## v0.2 · "zoo goes real"
 - [x] FFmpeg version in every report (reproducibility)

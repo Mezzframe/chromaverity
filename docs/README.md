@@ -29,6 +29,7 @@ These docs are written so that anyone on the project can explain what chromaveri
 | 09 | [Mislabel zoo](09-mislabel-zoo.md) | The synthetic test set today, and the dataset/benchmark plan |
 | 10 | [Learning path](10-learning-path.md) | What to learn, what to outsource, in what order |
 | | [Install](install.md) | Setup on macOS, Windows and Linux, shell differences, troubleshooting |
+| | [Release](release.md) | How a version gets tagged and published to PyPI, and the one-time Trusted Publishing setup |
 | | [Glossary](glossary.md) | Terms, in one place |
 | | [ADRs](adr/) | Decisions and the reasons behind them |
 | | [Work orders](work-orders/) | Numbered maintenance tasks (WO-001, ...), each one a checklist Claude Code carried out and Mark reviewed commit by commit. Read one to see how changes get made here |

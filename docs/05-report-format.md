@@ -7,7 +7,7 @@ The JSON report is the product. The text output and the MCP tool results are vie
 ```jsonc
 {
   "schema_version": "0.1",            // the report format's version, not the tool's
-  "tool": {"name": "chromaverity", "version": "0.1.0.dev0"},
+  "tool": {"name": "chromaverity", "version": "0.1.0"},
   "ffmpeg": {"version": "6.1.1-3ubuntu5"},  // the FFmpeg that made this report; {"version": null} if unreadable. Added in 0.1, no schema bump
   "kind": "inspect",                  // or "diff"
   "generated_at": "2026-10-13T16:04:08+00:00",
