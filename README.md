@@ -60,7 +60,7 @@ python -m venv .venv; .venv\Scripts\Activate.ps1
 pip install -e ".[dev,mcp]"
 ```
 
-Linux is tested in CI. macOS and Windows aren't yet. Full per-system guide, other Linux distros, WSL, cmd.exe and troubleshooting: [docs/install.md](docs/install.md).
+CI runs the full test suite on Linux, macOS and Windows. Full per-system guide, other Linux distros, WSL, cmd.exe and troubleshooting: [docs/install.md](docs/install.md).
 
 ## What it checks (v0.1)
 

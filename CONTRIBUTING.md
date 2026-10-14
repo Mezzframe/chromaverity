@@ -29,7 +29,7 @@ git config core.hooksPath .githooks
 pytest; ruff check .
 ```
 
-Windows contributors are especially welcome: CI only covers Linux today, so you'd be the first to find what breaks.
+Windows contributors are especially welcome: CI tests Windows through Git Bash, so you'd be the first to confirm the PowerShell and cmd steps.
 
 ## Pull requests
 1. One change per PR. Small is good.
