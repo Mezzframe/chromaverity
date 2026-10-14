@@ -52,7 +52,19 @@ jobs:
       - name: Install FFmpeg (Windows, Chocolatey)
         if: runner.os == 'Windows'
         # Chocolatey is preinstalled on GitHub's Windows runners; winget isn't reliably.
-        run: choco install ffmpeg -y --no-progress
+        # Its community server sometimes times out (504), and choco then exits 0
+        # having installed nothing (seen 2026-10-14). So we don't trust the exit
+        # code: we retry up to 3 times and check that ffmpeg is really on PATH.
+        # `::warning::` / `::error::` are GitHub annotations: they show up on the run page.
+        run: |
+          for attempt in 1 2 3; do
+            choco install ffmpeg -y --no-progress || true
+            if command -v ffmpeg >/dev/null; then exit 0; fi
+            echo "::warning::FFmpeg not installed (attempt $attempt of 3). Retrying in 30 s."
+            sleep 30
+          done
+          echo "::error::Could not install FFmpeg from Chocolatey after 3 attempts (server down?). Re-run the job later."
+          exit 1
       - name: Record tool versions (reproducibility)
         run: ffmpeg -version | head -1 && python --version
       - name: Install chromaverity with dev + mcp extras
