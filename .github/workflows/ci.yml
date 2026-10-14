@@ -26,8 +26,8 @@ jobs:
           - os: ubuntu-24.04
             python: "3.13"
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
       - name: Install FFmpeg (includes libx264 on Ubuntu)
@@ -44,10 +44,10 @@ jobs:
   secrets:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0     # scan full history, not just the last commit
-      - uses: gitleaks/gitleaks-action@v2
+      - uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Org-owned repos need a (free) GITLEAKS_LICENSE secret ⟨verify⟩; personal repos don't.
