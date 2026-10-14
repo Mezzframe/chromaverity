@@ -15,7 +15,7 @@ What you need to work on chromaverity, in the order it pays off, and what's fine
 | CI (GitHub Actions) | .github/workflows | Learn the basics, outsource tuning | The workflow is ~100 lines, mostly comments. It runs on Linux, macOS and Windows |
 | Shells on three systems (bash/zsh, PowerShell) | docs, CI, `fixes.py` | Learn the basics | Enough to activate a venv, quote a path with spaces, and read a CI log on each. [install.md](install.md) is the cheat sheet |
 | MCP protocol details | mcp_server.py | Outsource the protocol, learn the pattern | Use the SDK; understand tools, roots and why the server is read-only |
-| ML classifier training (v0.2+) | essence/ | Learn the evaluation side, outsource heavy training | You need to judge a confusion matrix and spot leakage; you don't need to write a training loop from scratch |
+| ML classifier training (v0.3) | essence/ | Learn the evaluation side, outsource heavy training | You need to judge a confusion matrix and spot leakage; you don't need to write a training loop from scratch |
 | Signal processing depth (histograms, statistics) | essence/ | Learn as needed | Grows with each new check |
 
 ## Suggested order for the next few sprints

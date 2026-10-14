@@ -7,24 +7,37 @@ chromaverity checks whether a video's color label (primaries, transfer, matrix, 
 An open tool from the [Mezzframe](https://mezzframe.ai) lab · Encode topic · v0.1 (pre-alpha)
 
 ```
-$ chromaverity inspect clip.mp4
+$ chromaverity inspect zoo/full_pixels_labelled_limited.mp4
+chromaverity 0.1.0.dev0  ·  FFmpeg 9.0.2  ·  zoo/full_pixels_labelled_limited.mp4
 
   primaries     BT.709 (HD)
   transfer      BT.709 (HD)
   matrix        BT.709 (HD)
   range         limited range (16-235 in 8-bit)
-  ...
+  chroma loc    left (MPEG-2 / H.264 default)
+  format        h264 1280x720 yuv420p (8-bit)
+  HDR metadata  none
 
 [ERR ] CT301  Labelled limited range, pixels look full range  (confidence: high)
-       Luma reaches 0..255 including reserved codes (0/255 in 8-bit). Limited-range black
-       is 16 and white is 235. Players will stretch these values again: crushed shadows
-       and clipped highlights.
+       Luma reaches 0..255 including reserved codes (0/255 in 8-bit). Limited-range black is 16
+       and white is 235. Players will stretch these values again: crushed shadows and clipped highlights.
+       hint: If the pixels are right, retag as full range (no re-encode). If the label is right, convert pixels to limited.
 
 Proposed (retag, no re-encode): Label the file as full range (pixels unchanged)
-  $ ffmpeg -n -i clip.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 -color_range pc clip.fullrange.mp4
+  why: Use this if the pixels are correct and only the flag is wrong.
+  $ ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 -color_range pc zoo/full_pixels_labelled_limited.fullrange.mp4
+
+Proposed (convert, re-encodes): Convert the pixels to limited range (label unchanged)
+  why: Use this if the delivery spec requires limited range. Costs one encode generation.
+  note: libx264 output; swap the encoder and quality settings for your delivery spec
+  $ ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -vf scale=in_range=full:out_range=limited -c:v libx264 -crf 16 -preset slow -color_range tv zoo/full_pixels_labelled_limited.limited.mp4
 
 Nothing was changed. Review a command, then run it yourself.
+
+1 error · 0 warn · 0 info
 ```
+
+(Real output from the [mislabel zoo](docs/09-mislabel-zoo.md), FFmpeg 9.0.2. Long lines are wrapped here.)
 
 ## Why
 
@@ -49,7 +62,7 @@ pip install -e ".[dev,mcp]"
 python scripts/make_zoo.py samples      # build synthetic test clips with known mislabels
 chromaverity inspect samples/full_pixels_labelled_limited.mp4
 chromaverity diff samples/good_limited_709.mp4 samples/hop_dropped_tags.mp4
-pytest                                  # 40 tests
+pytest                                  # the test suite; pure tests run even without FFmpeg
 ```
 
 On **Windows** (PowerShell), only the setup lines differ. The `make_zoo`, `chromaverity` and `pytest` lines are the same:

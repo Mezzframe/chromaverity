@@ -153,7 +153,7 @@ pytest
 
 On macOS and Linux `python` inside an active venv is the venv's Python, so `python` and `python3` both work. Forward slashes in paths work on Windows too, for Python and for chromaverity.
 
-If FFmpeg or libx264 is missing, `pytest` still runs the pure tests and marks the FFmpeg ones as skipped. If the summary line says some were skipped, `pytest -rs` lists each skip and its reason (`-r` = report, `s` = skipped). "ffmpeg/ffprobe with libx264 not available" means FFmpeg wasn't found; "PowerShell 7 (pwsh) not installed" is expected on most Macs and Linux machines.
+If FFmpeg or libx264 is missing, `pytest` still runs the pure tests and marks the FFmpeg ones as skipped. The summary lists each skip and its reason (we set `-ra` in `pyproject.toml`: `-r` = report, `a` = all but passes). "ffmpeg/ffprobe with libx264 not available" means FFmpeg wasn't found; "PowerShell 7 (pwsh) not installed" is expected on most Macs and Linux machines.
 
 ## 5. Contributors: the pre-commit hook
 

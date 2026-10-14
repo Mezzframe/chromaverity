@@ -40,7 +40,7 @@ SRC = (
 # Pixels: always convert RGB to *limited* BT.709 Y'CbCr first, because every
 # FFmpeg version agrees on that. For full-range pixels we then stretch the code
 # values with plain arithmetic (lutyuv). No range negotiation is involved, so the
-# result is the same on FFmpeg 4.x, 6.x and 7.x.
+# result is the same on FFmpeg 4.4, 6.1 and 9.0 (all three run in CI).
 #
 # Why not just `scale=out_range=pc`? Older FFmpeg (e.g. 4.4) silently converts
 # back to limited when the next filter asks for yuv420p. Our first zoo did that

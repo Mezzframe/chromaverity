@@ -47,7 +47,7 @@
 | `cli.py` | argparse front end, exit codes | report, safety |
 | `mcp_server.py` | MCP front end for agents, folder-restricted | report, safety |
 
-Rule of thumb for contributors: **only `safety.py` and the `measure` half of essence checks may start a process.** Everything else is pure functions you can test without FFmpeg.
+Rule of thumb for contributors: **every process starts through `safety.run()`**, and only three places call it: `probe.py` (ffprobe), `report.ffmpeg_version()` (`ffmpeg -version`) and the `measure` half of essence checks. Everything else is pure functions you can test without FFmpeg.
 
 ## One `inspect`, step by step
 
@@ -55,7 +55,7 @@ Rule of thumb for contributors: **only `safety.py` and the `measure` half of ess
 chromaverity inspect clip.mp4
   1. cli.py        parse args
   2. safety.py     resolve path, refuse URLs/dirs/missing  ──► exit 4 on refusal
-  3. probe.py      ffprobe -show_streams -show_frames (first frame only)
+  3. probe.py      ffprobe -show_streams -show_format -show_frames (first frame only)
   4. tags.py       ColorTags(primaries, transfer, matrix, range, ...)
   5. lint.py       CT1xx findings
   6. range_check   ffmpeg fps=N,signalstats  ──► 24 × (YMIN, YMAX, BRNG), spread over the clip

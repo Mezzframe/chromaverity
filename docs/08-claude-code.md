@@ -14,7 +14,7 @@ cd chromaverity
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,mcp]"
 git config core.hooksPath .githooks                   # turn on the secret-scan pre-commit hook
-pytest                                                # 40 tests, a few seconds with FFmpeg
+pytest                                                # the test suite, a few seconds with FFmpeg
 claude                                                # start Claude Code in the repo
 ```
 
@@ -30,7 +30,7 @@ Claude Code reads [`CLAUDE.md`](../CLAUDE.md) at the repo root automatically. It
 ### Good first prompts
 
 - "Read docs/02-how-it-works.md and explain the module map back to me."
-- "Add a CT1xx lint rule for HLG at 8-bit. Follow the 'Where to add things' table."
+- "Add the check from ROADMAP for a container `colr` box that disagrees with the bitstream VUI. Pick the next free CT1xx/CT2xx ID and follow the 'Where to add things' table in 02."
 - "Run the zoo and show me the evidence for each CT3xx verdict."
 - "Do a spine check on this change."
 
@@ -43,11 +43,11 @@ Claude Code reads [`CLAUDE.md`](../CLAUDE.md) at the repo root automatically. It
 | `chromaverity_inspect` | `path`, optional `frames` (1-240) | Full inspect report (findings, evidence, proposed fixes as text) |
 | `chromaverity_diff` | `before`, `after` | Diff report |
 
-Both are read-only and refuse paths outside `--root`.
+Both are read-only and refuse paths outside `--root`. A bare filename (`clip.mp4`) is taken relative to `--root`. Refusals come back as data, `{"error": "UnsafeInput", "message": "..."}`, so the agent can tell the person what happened.
 
 ### Add it to Claude Code
 
-The repo ships a project-scoped [`.mcp.json`](../.mcp.json) that points the server at `./samples`. Claude Code asks you to approve project MCP servers the first time ⟨verify current behavior⟩. Or add it yourself:
+The repo ships a project-scoped [`.mcp.json`](../.mcp.json) that points the server at `./samples`. That folder is git-ignored, so run `python scripts/make_zoo.py samples` once first, and start `claude` from a terminal with the venv active. Claude Code asks you to approve project MCP servers the first time ⟨verify current behavior⟩. Or add it yourself:
 
 ```bash
 claude mcp add chromaverity -- chromaverity mcp --root ~/Videos/qc-inbox    # ⟨verify syntax for your Claude Code version⟩
