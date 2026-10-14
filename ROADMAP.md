@@ -19,7 +19,8 @@ Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order
 - [ ] Full luma histogram + chroma evidence for range
 - [ ] Retag via `av1_metadata` ⟨verify options⟩
 - [ ] Pin dev deps, Dependabot, SBOM on release
-- [ ] CI on macOS and Windows too, so [install.md](docs/install.md) can say "tested" for all three
+- [x] CI on macOS and Windows too, so [install.md](docs/install.md) can say "tested" for all three
+- [ ] New check: container `colr` box and bitstream VUI disagree (found while fixing FFmpeg 9 retags; needs the next free CT1xx/CT2xx ID)
 - [ ] Print proposed fixes quoted for the user's shell (PowerShell/cmd on Windows), not only bash
 
 ## v0.3 · "transfer and matrix"

@@ -38,7 +38,9 @@ def test_filenames_with_shell_characters_are_just_names(tmp_path: Path):
     weird = tmp_path / "a; rm -rf ~ $(whoami).mp4"
     weird.write_bytes(b"x")
     p = checked_media_path(weird)
-    assert ffmpeg_input(p).startswith("file:/")
+    # Absolute path behind file:, whatever the OS ("file:/tmp/..." or "file:C:\\...").
+    assert p.is_absolute()
+    assert ffmpeg_input(p) == f"file:{p}"
 
 
 def test_mcp_refuses_paths_outside_root(tmp_path: Path):

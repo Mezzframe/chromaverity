@@ -107,9 +107,12 @@ def build_dropped(out: Path) -> Path:
     """A 'hop' that loses the label: copy good_limited_709 and blank its flags."""
     src = out / "good_limited_709.mp4"
     dst = out / "hop_dropped_tags.mp4"
-    # 2 = "unspecified" in H.273: this is what a careless hop leaves behind
+    # 2 = "unspecified" in H.273: this is what a careless hop leaves behind.
+    # The -color_* options blank the container's colr box too. Without them
+    # FFmpeg 9 copies the source's BT.709 into it and the "hop" drops nothing.
     _ffmpeg("-i", str(src), "-c", "copy",
             "-bsf:v", "h264_metadata=colour_primaries=2:transfer_characteristics=2:matrix_coefficients=2",
+            "-color_primaries", "unspecified", "-color_trc", "unspecified", "-colorspace", "unspecified",
             str(dst))
     return dst
 

@@ -6,12 +6,12 @@ chromaverity is plain Python plus the `ffmpeg` and `ffprobe` programs, so it sho
 
 | System | Status | How we know |
 |---|---|---|
-| Linux (Ubuntu 22.04, 24.04) | Full test suite passes | Measured: runs in CI on every push |
-| macOS | Pure tests pass. FFmpeg tests not yet run on a Mac | Measured on the maintainer's Mac (2026-10-13), FFmpeg not installed there yet |
-| Windows | Not tested yet | ⟨assumption⟩ The code handles drive letters (`C:\...`) and never uses a shell, so it should work. Please [tell us](https://github.com/Novapakt/chromaverity/issues) either way |
+| Linux (Ubuntu 22.04, 24.04) | Full test suite passes | Measured: CI on every push (FFmpeg 4.4 and 6.1) |
+| macOS | Full test suite passes | Measured: CI on every push (`macos-latest`, Homebrew FFmpeg 9.0), and on the maintainer's Mac (FFmpeg 9.0.2) |
+| Windows | Full test suite passes | Measured: CI on every push (`windows-latest`, FFmpeg 9.0 from gyan.dev via Chocolatey). CI runs the commands in Git Bash, so PowerShell and cmd steps below are ⟨assumption⟩ until someone reports back |
 | Windows via WSL2 | Same as Linux ⟨assumption⟩ | WSL2 runs a real Ubuntu, so follow the Linux steps inside it |
 
-If you're on Windows and want the least surprise today, WSL2 is the safe route. Native Windows is the route we want to make solid, and your reports help.
+Found something that doesn't work on your system? Please [tell us](https://github.com/Novapakt/chromaverity/issues).
 
 ## 1. What you need
 
@@ -30,7 +30,7 @@ If you're on Windows and want the least surprise today, WSL2 is the safe route. 
 brew install python ffmpeg git gitleaks
 ```
 
-`brew` is the [Homebrew](https://brew.sh) package manager. Homebrew's `ffmpeg` includes libx264 ⟨verify⟩. If you use pyenv or the python.org installer instead, that's fine too: anything that gives you `python3 --version` of 3.10+.
+`brew` is the [Homebrew](https://brew.sh) package manager. Homebrew's `ffmpeg` includes libx264 (measured: the FFmpeg tests run in CI on macOS). If you use pyenv or the python.org installer instead, that's fine too: anything that gives you `python3 --version` of 3.10+.
 
 ### Linux
 

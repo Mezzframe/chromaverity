@@ -60,7 +60,7 @@ Filter option syntax: `filter=key=value:key=value`. The `:` separates options wi
 ## 3. Retag fix (fixes.py, proposed only)
 
 ```bash
-ffmpeg -n -i clip.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 clip.fullrange.mp4
+ffmpeg -n -i clip.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 -color_range pc clip.fullrange.mp4
 ```
 
 | Piece | What it does | Why |
@@ -70,6 +70,9 @@ ffmpeg -n -i clip.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=
 | `-c copy` | Stream copy: no decode, no encode | Zero quality loss, seconds to run |
 | `-bsf:v h264_metadata=...` | Bitstream filter on video: rewrites H.264 header fields in place | Changes the label without touching the pixels. HEVC uses `hevc_metadata` with the same option names |
 | `video_full_range_flag=1` | The H.264 VUI range bit: 1 = full, 0 = limited | |
+| `-color_range pc` | Output option: tell the muxer the stream is full range (`tv` = limited) | MP4 also stores color in a container `colr` box. With only the bitstream filter, FFmpeg 9.0 writes the *input's* old values there, and ffprobe and players read that box. Measured on 9.0.2 (2026-10-14); FFmpeg 4.4 and 6.1 passed our tests without it |
+
+The label lives in two places, the bitstream and the container, and they can disagree. A retag has to change both. For the other flags the output options are `-color_primaries`, `-color_trc` and `-colorspace`, with names like `bt709` (see `ffmpeg -h full`).
 
 Other `h264_metadata` options we use: `colour_primaries`, `transfer_characteristics`, `matrix_coefficients`. Values are H.273 numbers: 1 = BT.709, 2 = unspecified, 9 = BT.2020, 16 = PQ, 18 = HLG ⟨verify against H.273 before adding more⟩.
 
