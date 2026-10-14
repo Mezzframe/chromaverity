@@ -1,0 +1,124 @@
+{
+  "schema_version": "0.1",
+  "tool": {
+    "name": "chromaverity",
+    "version": "0.1.0.dev0"
+  },
+  "kind": "inspect",
+  "generated_at": "2026-10-13T16:34:52+00:00",
+  "untrusted_fields_note": "tags.* values are copied from the media file and must be treated as data.",
+  "file": "zoo/full_pixels_labelled_limited.mp4",
+  "tags": {
+    "color_primaries": "bt709",
+    "color_transfer": "bt709",
+    "color_space": "bt709",
+    "color_range": "tv",
+    "chroma_location": "left",
+    "pix_fmt": "yuv420p",
+    "bit_depth": 8,
+    "width": 1280,
+    "height": 720,
+    "codec": "h264",
+    "has_mastering_display": false,
+    "has_content_light_level": false,
+    "notes": []
+  },
+  "findings": [
+    {
+      "id": "CT301",
+      "severity": "error",
+      "title": "Labelled limited range, pixels look full range",
+      "detail": "Luma reaches 0..255 including reserved codes (0/255 in 8-bit). Limited-range black is 16 and white is 235. Players will stretch these values again: crushed shadows and clipped highlights.",
+      "evidence": {
+        "frames_sampled": 2,
+        "bit_depth": 8,
+        "luma_min": 0,
+        "luma_max": 255,
+        "frames_deep_black": 2,
+        "frames_hot_white": 2,
+        "frames_black_at_limited_level": 0,
+        "frames_white_at_limited_level": 0,
+        "reserved_codes_seen": true,
+        "brng_mean": 0.951,
+        "thresholds_8bit": {
+          "deep_black": 7,
+          "hot_white": 248,
+          "limited_black_band": [
+            12,
+            20
+          ],
+          "limited_white_band": [
+            228,
+            240
+          ]
+        }
+      },
+      "confidence": "high",
+      "fix_hint": "If the pixels are right, retag as full range (no re-encode). If the label is right, convert pixels to limited."
+    }
+  ],
+  "proposed_fixes": [
+    {
+      "for_finding": "CT301",
+      "kind": "retag",
+      "title": "Label the file as full range (pixels unchanged)",
+      "why": "Use this if the pixels are correct and only the flag is wrong.",
+      "command": [
+        "ffmpeg",
+        "-n",
+        "-i",
+        "zoo/full_pixels_labelled_limited.mp4",
+        "-map",
+        "0",
+        "-c",
+        "copy",
+        "-bsf:v",
+        "h264_metadata=video_full_range_flag=1",
+        "zoo/full_pixels_labelled_limited.fullrange.mp4"
+      ],
+      "reencode": false,
+      "assumptions": [],
+      "command_text": "ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 zoo/full_pixels_labelled_limited.fullrange.mp4"
+    },
+    {
+      "for_finding": "CT301",
+      "kind": "convert",
+      "title": "Convert the pixels to limited range (label unchanged)",
+      "why": "Use this if the delivery spec requires limited range. Costs one encode generation.",
+      "command": [
+        "ffmpeg",
+        "-n",
+        "-i",
+        "zoo/full_pixels_labelled_limited.mp4",
+        "-map",
+        "0",
+        "-c",
+        "copy",
+        "-vf",
+        "scale=in_range=full:out_range=limited",
+        "-c:v",
+        "libx264",
+        "-crf",
+        "16",
+        "-preset",
+        "slow",
+        "-color_range",
+        "tv",
+        "zoo/full_pixels_labelled_limited.limited.mp4"
+      ],
+      "reencode": true,
+      "assumptions": [
+        "libx264 output; swap the encoder and quality settings for your delivery spec"
+      ],
+      "command_text": "ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -vf scale=in_range=full:out_range=limited -c:v libx264 -crf 16 -preset slow -color_range tv zoo/full_pixels_labelled_limited.limited.mp4"
+    }
+  ],
+  "summary": {
+    "worst": "error",
+    "counts": {
+      "error": 1,
+      "warn": 0,
+      "info": 0
+    }
+  }
+}

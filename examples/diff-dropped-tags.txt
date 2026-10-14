@@ -1,0 +1,15 @@
+chromaverity 0.1.0.dev0  ·  diff
+  before: zoo/good_limited_709.mp4
+  after:  zoo/hop_dropped_tags.mp4
+
+[WARN] CT201  color_primaries dropped at this hop
+       color_primaries: BT.709 (HD) -> not set
+       hint: Pass the flag explicitly on the encoder, or retag the output (see `chromaverity inspect` on the output for a proposed command).
+[WARN] CT201  color_transfer dropped at this hop
+       color_transfer: BT.709 (HD) -> not set
+       hint: Pass the flag explicitly on the encoder, or retag the output (see `chromaverity inspect` on the output for a proposed command).
+[WARN] CT201  color_space dropped at this hop
+       color_space: BT.709 (HD) -> not set
+       hint: Pass the flag explicitly on the encoder, or retag the output (see `chromaverity inspect` on the output for a proposed command).
+
+0 error · 3 warn · 0 info

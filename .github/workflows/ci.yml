@@ -1,0 +1,53 @@
+# CI: runs on every push and pull request.
+# Two jobs: tests (does it work?) and secrets (did anyone commit a key?).
+# ⟨verify⟩ action major versions before first run; SEC spine "should": pin actions by commit SHA.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read          # least privilege: CI only needs to read the code
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Two Ubuntu releases = two FFmpeg versions for free (4.4 and 6.1 ⟨verify⟩).
+        # FFmpeg behavior changes between versions (see docs/09-mislabel-zoo.md),
+        # so we test the oldest and newest we support, not just one.
+        include:
+          - os: ubuntu-22.04
+            python: "3.10"
+          - os: ubuntu-24.04
+            python: "3.13"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install FFmpeg (includes libx264 on Ubuntu)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - name: Record tool versions (reproducibility)
+        run: ffmpeg -version | head -1 && python --version
+      - name: Install chromaverity with dev + mcp extras
+        run: pip install -e ".[dev,mcp]"
+      - name: Lint (includes bandit-style security rules)
+        run: ruff check .
+      - name: Test (builds the synthetic zoo, then runs every check end to end)
+        run: pytest -v
+
+  secrets:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # scan full history, not just the last commit
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Org-owned repos need a (free) GITLEAKS_LICENSE secret ⟨verify⟩; personal repos don't.

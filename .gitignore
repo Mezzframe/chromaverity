@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Secrets: never commit these
+.env
+.env.*
+*.pem
+*.key
+
+# Generated media (rebuild with scripts/make_zoo.py)
+samples/
+zoo/
+*.mp4
+*.mkv
+*.mov
+*.mxf
+*.ts
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

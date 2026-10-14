@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "chromaverity": {
+      "type": "stdio",
+      "command": "chromaverity",
+      "args": ["mcp", "--root", "./samples"]
+    }
+  }
+}
