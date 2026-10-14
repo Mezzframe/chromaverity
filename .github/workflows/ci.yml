@@ -25,13 +25,34 @@ jobs:
             python: "3.10"
           - os: ubuntu-24.04
             python: "3.13"
+          # macOS and Windows: one job each on the newest Python, so docs/install.md
+          # can say "tested" instead of "assumed". Their FFmpeg comes from Homebrew
+          # and Chocolatey, which track recent releases ⟨verify versions in the log⟩.
+          - os: macos-latest
+            python: "3.13"
+          - os: windows-latest
+            python: "3.13"
+    defaults:
+      run:
+        # bash on every OS (Windows runners ship Git Bash), so one set of commands
+        # works everywhere. Without this, Windows steps would run in PowerShell.
+        shell: bash
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
-      - name: Install FFmpeg (includes libx264 on Ubuntu)
+      # One install step per OS; `if:` picks the right one. runner.os is Linux, macOS or Windows.
+      - name: Install FFmpeg (Linux, apt; includes libx264)
+        if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - name: Install FFmpeg (macOS, Homebrew)
+        if: runner.os == 'macOS'
+        run: brew install ffmpeg
+      - name: Install FFmpeg (Windows, Chocolatey)
+        if: runner.os == 'Windows'
+        # Chocolatey is preinstalled on GitHub's Windows runners; winget isn't reliably.
+        run: choco install ffmpeg -y --no-progress
       - name: Record tool versions (reproducibility)
         run: ffmpeg -version | head -1 && python --version
       - name: Install chromaverity with dev + mcp extras
