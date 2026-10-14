@@ -62,6 +62,32 @@ jobs:
       - name: Test (builds the synthetic zoo, then runs every check end to end)
         run: pytest -v
 
+      # The steps above run in bash on every OS. Windows users mostly use
+      # PowerShell or cmd, so on Windows we also follow docs/install.md
+      # literally in those shells. If these break, the install guide is wrong.
+      - name: Smoke test the PowerShell steps from docs/install.md (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          # Make a failing program (exit code != 0) stop the step, like `set -e` in bash.
+          $PSNativeCommandUseErrorActionPreference = $true
+          python -m venv .venv-ps
+          .venv-ps\Scripts\Activate.ps1
+          pip install -e .
+          python scripts/make_zoo.py samples
+          chromaverity inspect samples\good_limited_709.mp4
+          # On Windows the proposed fix should be printed PowerShell-quoted.
+          $out = chromaverity inspect samples\full_pixels_labelled_limited.mp4 --fail-on never | Out-String
+          if ($out -notmatch 'PS> ffmpeg') { Write-Output $out; throw "expected a PowerShell-quoted fix line" }
+      - name: Smoke test the cmd.exe steps from docs/install.md (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        # `call` is needed inside a batch file (which is what this step is);
+        # typed at a cmd prompt, plain `.venv\Scripts\activate.bat` is enough.
+        run: |
+          call .venv-ps\Scripts\activate.bat
+          chromaverity inspect samples\good_limited_709.mp4
+
   secrets:
     runs-on: ubuntu-24.04
     steps:

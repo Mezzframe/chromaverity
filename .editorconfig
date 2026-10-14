@@ -1,0 +1,25 @@
+# Shared editor settings, read by VS Code (with the EditorConfig extension),
+# JetBrains, Vim, Notepad++ and others on every OS. Keeps line endings and
+# encoding consistent whoever edits the file. See editorconfig.org.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+[*.{yml,yaml,toml,json,cff}]
+indent_style = space
+indent_size = 2
+
+[*.md]
+# Two trailing spaces are a line break in Markdown; don't strip them.
+trim_trailing_whitespace = false
+
+[*.{bat,cmd}]
+end_of_line = crlf

@@ -13,6 +13,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 - Mislabel zoo generator is now FFmpeg-version-proof: pixels are made with plain arithmetic (`lutyuv`), labels are written afterwards with `h264_metadata`. FFmpeg 4.4 silently undid `scale=out_range=pc`, which made the old "good full range" clip a real mislabel.
 
 ### Added
+- Every proposed fix now has `command_text_powershell` next to `command_text` (bash). The text output shows the PowerShell form on Windows (`PS> ...`). New report field, no schema bump. Quoting is tested by round-tripping awkward filenames through real PowerShell.
+- `.gitattributes` (LF line endings everywhere, so the bash pre-commit hook works on Windows) and `.editorconfig`.
+- CI on Windows also follows docs/install.md in PowerShell and cmd.exe, not only Git Bash.
+- CONTRIBUTING "Writing docs for three systems"; PR template checkbox; CLAUDE.md rule.
 - CI now runs on macOS and Windows as well as Ubuntu.
 - `docs/install.md`: setup on macOS, Windows (PowerShell, cmd, Git Bash, WSL2) and Linux (Debian/Ubuntu, Fedora, Arch), shell quoting differences, MCP paths per system, troubleshooting. README, CONTRIBUTING and docs 04/08 now show Windows commands alongside macOS/Linux.
 - `chromaverity inspect`: label lint (CT101-CT109), range check against pixels (CT300-CT304), proposed fixes.

@@ -80,7 +80,8 @@
       ],
       "reencode": false,
       "assumptions": [],
-      "command_text": "ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 -color_range pc zoo/full_pixels_labelled_limited.fullrange.mp4"
+      "command_text": "ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 -color_range pc zoo/full_pixels_labelled_limited.fullrange.mp4",
+      "command_text_powershell": "ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 -color_range pc zoo/full_pixels_labelled_limited.fullrange.mp4"
     },
     {
       "for_finding": "CT301",
@@ -112,7 +113,8 @@
       "assumptions": [
         "libx264 output; swap the encoder and quality settings for your delivery spec"
       ],
-      "command_text": "ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -vf scale=in_range=full:out_range=limited -c:v libx264 -crf 16 -preset slow -color_range tv zoo/full_pixels_labelled_limited.limited.mp4"
+      "command_text": "ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -vf scale=in_range=full:out_range=limited -c:v libx264 -crf 16 -preset slow -color_range tv zoo/full_pixels_labelled_limited.limited.mp4",
+      "command_text_powershell": "ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -vf scale=in_range=full:out_range=limited -c:v libx264 -crf 16 -preset slow -color_range tv zoo/full_pixels_labelled_limited.limited.mp4"
     }
   ],
   "summary": {

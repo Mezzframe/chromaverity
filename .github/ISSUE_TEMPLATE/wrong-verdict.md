@@ -10,6 +10,8 @@ labels: zoo, accuracy
 
 **ffprobe output** (`ffprobe -v error -show_streams -select_streams v:0 -of json FILE`):
 
-**FFmpeg version** (`ffmpeg -version | head -1`):
+**FFmpeg version** (the first line of `ffmpeg -version`):
+
+**Your system** (macOS / Windows / Linux, and which shell):
 
 Please don't attach footage you don't have the rights to share. The report and ffprobe output are usually enough for us to rebuild the case synthetically.

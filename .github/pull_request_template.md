@@ -9,6 +9,7 @@
 ## Docs
 - [ ] Checks reference / how-it-works / report format updated if affected
 - [ ] CHANGELOG `[Unreleased]` entry
+- [ ] Any new or changed command works on macOS, Linux **and** Windows, or the doc gives each version (see CONTRIBUTING "Writing docs for three systems")
 
 ## Spine check (lite)
 | Spine | Finding | Decision |

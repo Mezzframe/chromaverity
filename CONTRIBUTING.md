@@ -29,7 +29,7 @@ git config core.hooksPath .githooks
 pytest; ruff check .
 ```
 
-Windows contributors are especially welcome: CI tests Windows through Git Bash, so you'd be the first to confirm the PowerShell and cmd steps.
+Any of macOS, Windows or Linux is fine to contribute from; CI tests all three.
 
 ## Pull requests
 1. One change per PR. Small is good.
@@ -37,6 +37,13 @@ Windows contributors are especially welcome: CI tests Windows through Git Bash, 
 3. Update the docs in the same PR (checks reference, how-it-works, CHANGELOG `[Unreleased]`).
 4. Fill in the PR template, including a lite spine check.
 5. Never commit media you don't have rights to, or anything from an employer.
+
+## Writing docs for three systems
+Contributors use macOS, Windows and Linux, so every command in the docs has to work for all of them.
+- If a command is the same everywhere (`pytest`, `chromaverity inspect ...`, `git ...`), one `bash` block is fine. Say so if it's not obvious.
+- If it differs (installing tools, activating the venv, `head`, `$PWD`, `\` line breaks), give a macOS/Linux block **and** a Windows PowerShell block. Add cmd only where people really use it.
+- Put the details in [docs/install.md](docs/install.md) and link to it rather than repeating them.
+- Mark anything you couldn't test on a system with ⟨assumption⟩.
 
 ## Ground rules from the codebase
 Read [CLAUDE.md](CLAUDE.md) "Rules of the codebase". The big ones: no shell, no apply paths, measure/classify split, stable finding IDs.
