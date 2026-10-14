@@ -4,7 +4,9 @@
 
 [project]
 name = "chromaverity"
-version = "0.1.0.dev0"
+# The version lives in src/chromaverity/__init__.py (see [tool.hatch.version]);
+# one place to bump. CITATION.cff still has its own copy: update it at release.
+dynamic = ["version"]
 description = "Check whether a video's color labels match its pixels."
 readme = "README.md"
 license = "Apache-2.0"
@@ -12,19 +14,29 @@ license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.10"
 authors = [{ name = "Mezzframe" }]
 keywords = ["video", "ffmpeg", "color", "broadcast", "qc", "hdr", "mcp"]
+# No "License ::" classifier on purpose: the SPDX `license` field above replaces
+# it (PEP 639) and hatchling refuses to have both.
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",
   "Intended Audience :: Developers",
+  "Environment :: Console",
+  "Operating System :: OS Independent",
   "Topic :: Multimedia :: Video",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
 ]
 # No runtime dependencies on purpose: stdlib + the ffmpeg/ffprobe binaries.
 dependencies = []
 
 [project.optional-dependencies]
-# MCP server for AI agents. ⟨verify⟩ 2.x API (MCPServer); pin tighter once tested.
-mcp = ["mcp>=2,<3"]
-dev = ["pytest>=8", "ruff>=0.6"]
+# MCP server for AI agents. Written against the 2.x API (MCPServer); 2.3.0 tested.
+mcp = ["mcp>=2.3,<3"]
+# build + twine are what CI uses to check the wheel and sdist before a release.
+dev = ["pytest>=8", "ruff>=0.6", "build>=1.2", "twine>=5"]
 
 [project.scripts]
 # Installing the package puts a `chromaverity` command on your PATH that calls main().
@@ -33,6 +45,7 @@ chromaverity = "chromaverity.cli:main"
 [project.urls]
 Homepage = "https://mezzframe.ai"
 Repository = "https://github.com/Novapakt/chromaverity"
+Documentation = "https://github.com/Novapakt/chromaverity/blob/main/docs/README.md"
 Issues = "https://github.com/Novapakt/chromaverity/issues"
 Changelog = "https://github.com/Novapakt/chromaverity/blob/main/CHANGELOG.md"
 
@@ -40,11 +53,24 @@ Changelog = "https://github.com/Novapakt/chromaverity/blob/main/CHANGELOG.md"
 requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
+[tool.hatch.version]
+path = "src/chromaverity/__init__.py"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/chromaverity"]
 
+[tool.hatch.build.targets.sdist]
+# Explicit, so the sdist can't pick up a stray local file that a contributor's
+# global gitignore happens to hide from `git status`.
+include = ["src/", "tests/", "scripts/", "docs/", "examples/", "*.md", "LICENSE*", "NOTICE", "CITATION.cff", "pyproject.toml"]
+exclude = ["docs/.DS_Store", "**/__pycache__"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# -ra: list every skip and its reason in the summary, so a silently skipped
+# FFmpeg suite is visible. --strict-markers: a typo in @pytest.mark.ffmpeg is an error.
+addopts = ["-ra", "--strict-markers"]
+xfail_strict = true
 markers = ["ffmpeg: needs ffmpeg/ffprobe and libx264 on PATH (generates test clips)"]
 
 [tool.ruff]
@@ -55,7 +81,9 @@ src = ["src", "tests"]
 [tool.ruff.lint]
 # E/F: errors and pyflakes. I: import order. B: likely bugs. UP: modern syntax.
 # S: security (bandit rules): catches shell=True, eval, hard-coded secrets.
-select = ["E", "F", "I", "B", "UP", "S"]
+# RUF: ruff's own checks. SIM: simplifications. C4: comprehension style.
+# PTH: use pathlib, not os.path (CLAUDE.md "three systems" rule).
+select = ["E", "F", "I", "B", "UP", "S", "RUF", "SIM", "C4", "PTH"]
 ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]

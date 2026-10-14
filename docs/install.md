@@ -10,7 +10,7 @@ The maintainer works on macOS with Homebrew. Everything in this repo (setup, tes
 |---|---|---|
 | Linux (Ubuntu 22.04, 24.04) | Full test suite passes | Measured: CI on every push (FFmpeg 4.4 and 6.1) |
 | macOS | Full test suite passes | Measured: CI on every push (`macos-latest`, Homebrew FFmpeg 9.0), and on the maintainer's Mac (FFmpeg 9.0.2) |
-| Windows | Full test suite passes | Measured: CI on every push (`windows-latest`, FFmpeg 9.0 from gyan.dev via Chocolatey). CI runs the test suite in Git Bash, then repeats the PowerShell and cmd setup steps below word for word. Not tested: Windows PowerShell 5.1 (CI uses PowerShell 7) |
+| Windows | Full test suite passes | Measured: CI on every push (`windows-latest`, FFmpeg 9.0 from gyan.dev via Chocolatey). CI runs the test suite in Git Bash, then runs the PowerShell and cmd lines from sections 3 and 4 below, as written. Not tested: Windows PowerShell 5.1 (CI uses PowerShell 7) |
 | Windows via WSL2 | Same as Linux ⟨assumption⟩ | WSL2 runs a real Ubuntu, so follow the Linux steps inside it |
 
 Found something that doesn't work on your system? Please [tell us](https://github.com/Novapakt/chromaverity/issues).

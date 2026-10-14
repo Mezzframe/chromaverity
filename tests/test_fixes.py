@@ -22,8 +22,8 @@ def finding(fid: str, **evidence) -> Finding:
 
 
 def h264(**overrides) -> ColorTags:
-    t = dict(color_primaries="bt709", color_transfer="bt709", color_space="bt709", color_range="tv",
-             pix_fmt="yuv420p", bit_depth=8, width=1920, height=1080, codec="h264")
+    t: dict = {"color_primaries": "bt709", "color_transfer": "bt709", "color_space": "bt709", "color_range": "tv",
+               "pix_fmt": "yuv420p", "bit_depth": 8, "width": 1920, "height": 1080, "codec": "h264"}
     t.update(overrides)
     return ColorTags(**t)
 
