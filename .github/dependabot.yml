@@ -1,0 +1,15 @@
+# Dependabot: opens PRs when our dependencies have new versions.
+# Each PR runs the full CI, so an update only merges if tests still pass.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"   # the uses: lines in .github/workflows/
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:                             # one PR for all action bumps, not one per action
+        patterns: ["*"]
+  - package-ecosystem: "pip"               # optional extras in pyproject.toml (mcp, dev)
+    directory: "/"
+    schedule:
+      interval: "weekly"
