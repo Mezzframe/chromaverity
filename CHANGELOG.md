@@ -5,6 +5,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ## [Unreleased]
 
 ### Fixed
+- CI: the Windows FFmpeg install retries when Chocolatey's server times out, and fails clearly instead of reporting success with nothing installed.
 - Text output could crash on Windows (`UnicodeEncodeError`) when piped or redirected, for any filename outside the console's code page (e.g. `クリップ.mp4`) and for the CT101 fix note. Unencodable characters now print as `?`; JSON and `--out` were never affected.
 - Retag fixes did nothing on FFmpeg 9: the bitstream filter changed the H.264 header, but the MP4 `colr` box kept the input's old values and ffprobe reported the old label. Proposed retag commands now also pass `-color_range` / `-color_primaries` / `-color_trc` / `-colorspace` so the container agrees. The zoo's `hop_dropped_tags` clip had the same problem and is fixed the same way.
 - `test_safety`: shell-characters test no longer assumes POSIX paths.
