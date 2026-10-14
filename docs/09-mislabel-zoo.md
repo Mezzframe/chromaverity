@@ -2,7 +2,7 @@
 
 ## Idea
 
-To test a detector you need files where you **know** what's wrong. Real mislabeled files are rare, usually not ours to publish, and we can never be sure what happened to them. So we make them:
+To test a detector you need files where you **know** what's wrong. Real mislabelled files are rare, usually not ours to publish, and we can never be sure what happened to them. So we make them:
 
 ```
  known-good pixels  +  a deliberate lie in the label  =  a test case with ground truth
@@ -21,7 +21,7 @@ Because the lie is ours, the ground truth is exact, and we can make as many case
 | full_pixels_labelled_limited | full | limited | CT301 |
 | limited_pixels_labelled_full | limited | full | CT302 |
 | full_pixels_unlabelled | full | none | CT303 |
-| hd_labelled_601 | 709 | 601 matrix | CT102 |
+| hd_labelled_601 | limited, BT.709 | limited, BT.601 matrix | CT102 |
 | hop_dropped_tags | copy of good_limited_709 | primaries/transfer/matrix blanked | CT201 |
 
 Three lessons found while building it, all exactly the kind of silent behavior this tool exists to catch:
@@ -38,7 +38,7 @@ Three lessons found while building it, all exactly the kind of silent behavior t
 | 2 | Generate the **full matrix** of lies: range × matrix × transfer × codec × bit depth | Systematic coverage |
 | 3 | Add **realistic hops**: x264, x265, SVT-AV1, ProRes, re-wraps, common cloud-encoder presets | Errors as they happen in the wild |
 | 4 | Publish a **benchmark**: accuracy, false alarms, inconclusive rate per check, plus the scripts to rebuild it | Something others can cite and beat |
-| 5 | Train the first **learned classifier** (matrix 601 vs 709) and publish results either way | The AI half of the project. Negative results count |
+| 5 | Train the first **learned classifier** (matrix 601 vs 709; this is the v0.3 milestone) and publish results either way | The AI half of the project. Negative results count |
 
 Distribution: generation scripts in this repo (Apache-2.0); generated media published separately with a dataset card (CC BY 4.0, source licenses listed) ⟨verify hosting: GitHub releases vs Hugging Face datasets⟩.
 

@@ -14,5 +14,8 @@ if ! command -v gitleaks >/dev/null 2>&1; then
   exit 1
 fi
 
-# 'protect --staged' scans only what you're about to commit. ⟨verify: newer gitleaks uses 'gitleaks git --staged'⟩
-gitleaks protect --staged --redact --no-banner
+# Scan only what you're about to commit. `gitleaks git --pre-commit --staged` is
+# the 8.19+ form; the old `gitleaks protect --staged` still works on 8.30 but is
+# deprecated, so we try the new one first and fall back for older installs.
+gitleaks git --pre-commit --staged --redact --no-banner 2>/dev/null \
+  || gitleaks protect --staged --redact --no-banner

@@ -22,7 +22,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from chromaverity.safety import ffmpeg_input, require_binary, run
+from chromaverity.safety import INPUT_GUARDS, ffmpeg_input, require_binary, run
 from chromaverity.tags import ColorTags
 
 
@@ -30,9 +30,10 @@ def ffprobe_json(path: Path) -> dict[str, Any]:
     cmd = [
         require_binary("ffprobe"),
         "-v", "error",
-        "-protocol_whitelist", "file",
+        *INPUT_GUARDS,                  # local files only, known containers only (safety.py)
         "-select_streams", "v:0",
         "-show_streams",
+        "-show_format",                 # for the duration, when the stream doesn't carry one
         "-show_frames",
         "-read_intervals", "%+#1",
         "-of", "json",
@@ -44,8 +45,26 @@ def ffprobe_json(path: Path) -> dict[str, Any]:
 
 def read_tags(path: Path) -> ColorTags:
     """Return the color label of the first video stream in `path`."""
+    return tags_from_probe(ffprobe_json(path))
+
+
+def read_tags_and_duration(path: Path) -> tuple[ColorTags, float | None]:
+    """One ffprobe call for both; the sampler uses the duration to spread its frames."""
     data = ffprobe_json(path)
-    return tags_from_probe(data)
+    return tags_from_probe(data), duration_from_probe(data)
+
+
+def duration_from_probe(data: dict[str, Any]) -> float | None:
+    """Seconds, from the stream if it says, else the container. None if neither does."""
+    streams = data.get("streams") or [{}]
+    for holder in (streams[0], data.get("format") or {}):
+        try:
+            value = float(holder.get("duration"))
+        except (TypeError, ValueError):
+            continue
+        if value > 0:
+            return value
+    return None
 
 
 def tags_from_probe(data: dict[str, Any]) -> ColorTags:

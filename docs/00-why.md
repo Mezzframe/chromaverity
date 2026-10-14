@@ -24,7 +24,7 @@ Files have no such plant. The label travels inside the file, written by whatever
                                                                            arrives
 ```
 
-Broadcast analogy: a tally light that says "on air" while the router is feeding a different source. The light isn't broken. It's reporting what it was told.
+Broadcast analogy: a tally light that says "on air" while the router is feeding a different source. The light works fine; it reports what it was told.
 
 ## What already exists (and where the gap is)
 
@@ -51,8 +51,8 @@ Where the AI is **not**: the AI doesn't decide pass/fail on its own, and it neve
 ## Why it could matter to people outside broadcast
 
 - **AI video builders** ship generated and upscaled video that is often untagged ⟨verify on current models⟩. chromaverity tells them what the pixels look like so they can label correctly.
-- **Archivists** digitizing tape and film need labels they can trust for the next 50 years. A wrong range flag in an archival master is a slow-motion disaster (see the Preserve topic at mezzframe.ai).
-- **Streaming engineers** get a cheap, open check to drop into CI before a ladder ships.
+- **Archivists** digitizing tape and film need labels they can trust for the next 50 years. A wrong range flag in an archival master is a slow-motion disaster. (Mezzframe's Preserve topic at [mezzframe.ai](https://mezzframe.ai) is about exactly this.)
+- **Streaming engineers** get a cheap, open check to drop into CI before an [ABR ladder](glossary.md) ships.
 
 ## What v0.1 does and doesn't do
 

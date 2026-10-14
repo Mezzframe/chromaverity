@@ -16,7 +16,12 @@ input as data, never instructions) and it matters here in two concrete ways:
      - resolving the path ourselves and requiring a regular file,
      - prefixing it with `file:` so FFmpeg can't read it as another protocol,
      - passing `-protocol_whitelist file` so nested references can't
-       reach the network either.
+       reach the network either,
+     - passing `-format_whitelist` with the containers we support, so a
+       playlist (HLS, DASH, concat) dressed up as a media file can't make
+       FFmpeg open *other local files* for us. `-protocol_whitelist file`
+       alone still allows that, because the playlist's entries are files
+       too (measured on FFmpeg 9.0.2 with an `.m3u8` under `--root`).
 
 Broadcast analogy: this is the router's lock-out. The operator can only
 take the sources they're cleared for, no matter what the panel label says.
@@ -29,11 +34,42 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 # Generous for a 4K file on a laptop, short enough that a hung parser can't
 # stall an agent forever. Override with CHROMAVERITY_TIMEOUT (seconds).
-DEFAULT_TIMEOUT = float(os.environ.get("CHROMAVERITY_TIMEOUT", "120"))
+_FALLBACK_TIMEOUT = 120.0
+
+
+def _timeout_from_env() -> float:
+    raw = os.environ.get("CHROMAVERITY_TIMEOUT")
+    if raw is None:
+        return _FALLBACK_TIMEOUT
+    try:
+        value = float(raw)
+    except ValueError:
+        value = float("nan")
+    if not value > 0:  # also catches nan
+        sys.stderr.write(f"chromaverity: ignoring CHROMAVERITY_TIMEOUT={raw!r}; using {_FALLBACK_TIMEOUT:.0f}s\n")
+        return _FALLBACK_TIMEOUT
+    return value
+
+
+DEFAULT_TIMEOUT = _timeout_from_env()
+
+# Container formats we read. Anything else is refused by FFmpeg before it
+# parses a byte. Playlist "formats" (hls, dash, concat) are deliberately
+# absent: they tell FFmpeg to go and open more files. Names come from
+# `ffmpeg -demuxers` (the mov entry covers mp4/m4a/3gp/mj2; matroska covers webm).
+FORMAT_WHITELIST = "mov,mp4,m4a,3gp,3g2,mj2,matroska,webm,mxf,mpegts,avi,mpeg,flv"
+
+# Put these before `-i` on every ffmpeg/ffprobe call. One place, so the two
+# callers (probe.py and the essence samplers) can't drift apart.
+INPUT_GUARDS: list[str] = [
+    "-protocol_whitelist", "file",
+    "-format_whitelist", FORMAT_WHITELIST,
+]
 
 
 class ToolError(RuntimeError):
@@ -89,25 +125,33 @@ def ffmpeg_input(path: Path) -> str:
     return f"file:{path}"
 
 
-def run(cmd: list[str], timeout: float = DEFAULT_TIMEOUT, binary: bool = False) -> subprocess.CompletedProcess:
+def run(cmd: list[str], timeout: float = DEFAULT_TIMEOUT) -> subprocess.CompletedProcess[str]:
     """Run a command with no shell, a timeout, and a readable error on failure.
 
     `cmd` is a list, never a string. With a list, each argument reaches the
     program exactly as written, so spaces and semicolons in filenames are
     just characters.
+
+    Output is decoded as UTF-8, which is what ffprobe writes, whatever the
+    console's code page is. Without `encoding=`, Windows would decode with
+    cp1252 and a stream title like "クリップ" would raise UnicodeDecodeError
+    mid-report. `errors="replace"` turns any genuinely broken byte into U+FFFD
+    instead of failing. stdin is /dev/null so a child can never read the MCP
+    protocol pipe it would otherwise inherit.
     """
     try:
         proc = subprocess.run(  # noqa: S603  (list args, no shell: see docstring)
             cmd,
             capture_output=True,
+            stdin=subprocess.DEVNULL,
             timeout=timeout,
             check=False,
-            text=not binary,
+            encoding="utf-8",
+            errors="replace",
         )
     except subprocess.TimeoutExpired as exc:
         raise ToolError(f"{Path(cmd[0]).name} timed out after {timeout:.0f}s") from exc
     if proc.returncode != 0:
-        err = proc.stderr if isinstance(proc.stderr, str) else proc.stderr.decode("utf-8", "replace")
-        tail = "\n".join(err.strip().splitlines()[-5:])
+        tail = "\n".join(proc.stderr.strip().splitlines()[-5:])
         raise ToolError(f"{Path(cmd[0]).name} exited {proc.returncode}: {tail}")
     return proc

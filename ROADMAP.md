@@ -1,13 +1,13 @@
 # Roadmap
 
-Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order can change; the backlog lives in GitHub issues once the repo is public.
+Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order can change; the backlog lives in [GitHub issues](https://github.com/Novapakt/chromaverity/issues).
 
 ## v0.1 · "range truth" (this release)
 - [x] Label lint (CT1xx), hop diff (CT2xx)
 - [x] Range check against pixels (CT30x) with confidence and evidence
 - [x] Proposed retag/convert commands (H.264, HEVC), never applied
 - [x] MCP server, read-only, folder-restricted
-- [x] Synthetic mislabel zoo v0.1 + 36 tests
+- [x] Synthetic mislabel zoo v0.1 + test suite
 - [x] CI green on GitHub from a clean clone
 - [ ] Tag `v0.1.0`, publish to PyPI ⟨verify name still free⟩
 
@@ -20,10 +20,12 @@ Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order
 - [ ] Publish range-check accuracy, false-alarm and inconclusive rates
 - [ ] Full luma histogram + chroma evidence for range
 - [ ] Retag via `av1_metadata` ⟨verify options⟩
-- [ ] Pin dev deps, Dependabot, SBOM on release
+- [x] Dependabot for actions and pip; actions pinned to commit SHAs
+- [ ] SBOM on release
 - [x] CI on macOS and Windows too, so [install.md](docs/install.md) can say "tested" for all three
 - [ ] New check: container `colr` box and bitstream VUI disagree (found while fixing FFmpeg 9 retags; needs the next free CT1xx/CT2xx ID)
-- [ ] Print proposed fixes quoted for the user's shell (PowerShell/cmd on Windows), not only bash
+- [x] Print proposed fixes quoted for PowerShell on Windows, not only bash
+- [ ] The same for cmd.exe
 
 ## v0.3 · "transfer and matrix"
 - [ ] CT31x transfer: PQ/HLG vs SDR from code-value distribution
@@ -32,7 +34,7 @@ Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order
 
 ## Later / ideas
 - `--apply` with dry run + confirm (needs its own ADR)
-- Scene-aware frame sampling
+- Scene-aware frame sampling (today: evenly spread, `frames / duration` per second)
 - Batch mode and an HTML report for archives
 - Chroma siting check (CT33x)
 - GitHub Action wrapper: `uses: Novapakt/chromaverity-action`

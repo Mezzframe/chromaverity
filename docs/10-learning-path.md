@@ -15,21 +15,23 @@ What you need to work on chromaverity, in the order it pays off, and what's fine
 | CI (GitHub Actions) | .github/workflows | Learn the basics, outsource tuning | The workflow is ~100 lines, mostly comments. It runs on Linux, macOS and Windows |
 | Shells on three systems (bash/zsh, PowerShell) | docs, CI, `fixes.py` | Learn the basics | Enough to activate a venv, quote a path with spaces, and read a CI log on each. [install.md](install.md) is the cheat sheet |
 | MCP protocol details | mcp_server.py | Outsource the protocol, learn the pattern | Use the SDK; understand tools, roots and why the server is read-only |
-| ML classifier training (v0.2+) | essence/ | Learn the evaluation side, outsource heavy training | You need to judge a confusion matrix and spot leakage; you don't need to write a training loop from scratch |
+| ML classifier training (v0.3) | essence/ | Learn the evaluation side, outsource heavy training | You need to judge a confusion matrix and spot leakage; you don't need to write a training loop from scratch |
 | Signal processing depth (histograms, statistics) | essence/ | Learn as needed | Grows with each new check |
 
-## Suggested order for the next few sprints
+## A learning sequence: read, run, change
 
-1. Run the zoo and read every evidence block in the reports. Explain CT301's confidence logic out loud.
-2. Add one lint rule end to end (code, test, docs). Small, complete, teaches the whole loop.
-3. Add a retag path for one more codec (AV1 via `av1_metadata` ⟨verify options⟩) with an end-to-end test that runs it.
-4. Prototype the transfer check (CT31x) as a notebook before writing it as a module.
-5. Start the v0.2 zoo with three public-domain clips.
+Each step has something to read, something to run, and something small to change. Do them in order; each one leans on the last.
+
+1. **Read** [01](01-color-primer.md) up to "The four flags". **Run** `ffprobe -v error -select_streams v:0 -show_streams samples/good_limited_709.mp4` and find those four flags in the output. **Change** nothing yet.
+2. **Read** [03](03-range-detection.md) "Method". **Run** `chromaverity inspect samples/full_pixels_labelled_limited.mp4 --json` and match every number in `evidence` to a line in the Rules block. **Change** `--frames 2` and see which evidence numbers move.
+3. **Read** `tests/test_range_classifier.py`: each test is one rule in plain English. **Run** `pytest tests/test_range_classifier.py -v`. **Change** one threshold in `range_check.py` and watch which test tells you exactly which promise you broke. Put it back.
+4. **Read** `tags.py`, then `lint.py`. **Run** `pytest -m "not ffmpeg"` (no FFmpeg needed). **Change**: add a lint rule end to end, following "Where to add things" in [02](02-how-it-works.md): code, test, a row in [06](06-checks-reference.md), a CHANGELOG line.
+5. **Read** `safety.py` and [07](07-security.md) together. **Run** `chromaverity inspect http://example.com/x.mp4` and `echo $?` (`$LASTEXITCODE` in PowerShell) to see exit 4. **Change**: write one more test in `tests/test_safety.py` for a path you think should be refused.
+6. **Read** [04](04-cli-anatomy.md) §3 and `fixes.py`. **Run** a proposed retag on a zoo clip, then `chromaverity diff` the before and after. **Change**: add a retag path for one more codec (AV1 via `av1_metadata` ⟨verify options⟩) with an end-to-end test that runs it.
+7. **Read** [09](09-mislabel-zoo.md). **Run** `python scripts/make_zoo.py samples --list`. **Change**: add one zoo case for a mislabel we don't cover yet.
+
+After that you're a maintainer. The sprint-sized items (prototype CT31x, start the v0.2 zoo) are in [ROADMAP.md](../ROADMAP.md).
 
 ## Where an AI pair helps most
 
-- Explaining an FFmpeg filter's source code or docs line by line.
-- Writing first-draft tests from a rule you describe in plain English.
-- Spine checks on a change before you open a PR.
-
-Where it helps least: deciding thresholds. Those come from measurement and broadcast experience, and they need a person who can say why.
+Explaining an FFmpeg filter's source or docs line by line, and drafting tests from a rule you state in plain English. Where it helps least: deciding thresholds. Those come from measurement and broadcast experience, and they need a person who can say why.

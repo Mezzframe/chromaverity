@@ -10,6 +10,8 @@ Two kinds of test live here:
 
 from __future__ import annotations
 
+import functools
+import os
 import shutil
 import subprocess
 import sys
@@ -20,19 +22,30 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def _have_x264() -> bool:
+@functools.lru_cache(maxsize=1)
+def have_ffmpeg() -> bool:
+    """ffmpeg, ffprobe and the libx264 encoder are all on PATH.
+
+    Asked lazily, so `pytest -m "not ffmpeg"` never starts a process.
+    """
     if not (shutil.which("ffmpeg") and shutil.which("ffprobe")):
         return False
-    out = subprocess.run(["ffmpeg", "-hide_banner", "-encoders"], capture_output=True, text=True).stdout
+    out = subprocess.run(
+        ["ffmpeg", "-hide_banner", "-encoders"], capture_output=True, text=True, timeout=30, check=False
+    ).stdout
     return "libx264" in out
 
 
-HAVE_FFMPEG = _have_x264()
+# CI sets this. A runner that failed to install FFmpeg would otherwise skip the
+# whole end-to-end suite and still show green.
+REQUIRE_FFMPEG = os.environ.get("CHROMAVERITY_REQUIRE_FFMPEG") == "1"
 
 
 @pytest.fixture(scope="session")
 def zoo(tmp_path_factory: pytest.TempPathFactory) -> Path:
-    if not HAVE_FFMPEG:
+    if not have_ffmpeg():
+        if REQUIRE_FFMPEG:
+            pytest.fail("CHROMAVERITY_REQUIRE_FFMPEG=1 but ffmpeg/ffprobe with libx264 is not available")
         pytest.skip("ffmpeg/ffprobe with libx264 not available")
     out = tmp_path_factory.mktemp("zoo")
     subprocess.run([sys.executable, str(ROOT / "scripts" / "make_zoo.py"), str(out)], check=True)

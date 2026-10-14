@@ -11,5 +11,5 @@ Use only the Python standard library at runtime and shell out (safely, see `safe
 ## Consequences
 - Installs with zero dependency resolution; tiny supply-chain surface (SEC spine).
 - Measurements match what broadcast engineers already trust (`signalstats`).
-- Behavior depends on the user's FFmpeg version. We record it in reports later and test in CI on one pinned version ⟨should⟩.
+- Behavior depends on the user's FFmpeg version. Every report records it (`ffmpeg.version`), and CI tests on 4.4, 6.1 and 9.0, because the versions really do disagree (see docs/09).
 - Per-pixel work beyond what FFmpeg filters offer (full histograms, learned models) will need NumPy. That will arrive as an optional extra (`[ml]`), not a core dependency.

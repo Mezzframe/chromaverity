@@ -13,7 +13,7 @@ chromaverity checks whether a video's color label matches its pixels. Mezzframe 
 - **Voice in docs:** short, friendly, "we". No heavy em-dashes, no "it's not just X, it's Y", no padded lists of three, no stock words (delve, landscape, robust, seamless, pivotal).
 
 ## Rules of the codebase
-1. Only `safety.py` and the `sample_*` half of essence checks start processes. Always `safety.run()` with a list, never a shell. Inputs go through `checked_media_path()` and `ffmpeg_input()`.
+1. Every process starts through `safety.run()`, with a list, never a shell. Its callers are `probe.py`, `report.ffmpeg_version()` and the `sample_*` half of essence checks; nothing else. Inputs go through `checked_media_path()`, `ffmpeg_input()` and `INPUT_GUARDS`.
 2. Pixel checks = `sample_*` (measure) + `classify_*` (pure). Keep them split (docs/adr/0003).
 3. No code path modifies, moves or deletes media. Fixes are text in `proposed_fixes` (docs/adr/0004).
 4. Finding IDs never change meaning. New check = next free ID + test + entry in docs/06-checks-reference.md.

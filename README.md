@@ -4,31 +4,44 @@
 
 chromaverity checks whether a video's color label (primaries, transfer, matrix, range) matches what's actually in the picture. It reads the label, checks it across processing hops, measures the pixels, and tells you where they disagree, how sure it is, and the FFmpeg command that would fix it. It runs from the command line, in CI, or as an MCP tool that AI agents can call to check their own transcodes.
 
-An open tool from the [Mezzframe](https://mezzframe.ai) lab · Encode topic · v0.1 (pre-alpha)
+An open tool from the [Mezzframe](https://mezzframe.ai) lab, published from the maintainer's GitHub account (Novapakt) · Encode topic · v0.1 (pre-alpha)
 
 ```
-$ chromaverity inspect clip.mp4
+$ chromaverity inspect zoo/full_pixels_labelled_limited.mp4
+chromaverity 0.1.0.dev0  ·  FFmpeg 9.0.2  ·  zoo/full_pixels_labelled_limited.mp4
 
   primaries     BT.709 (HD)
   transfer      BT.709 (HD)
   matrix        BT.709 (HD)
   range         limited range (16-235 in 8-bit)
-  ...
+  chroma loc    left (MPEG-2 / H.264 default)
+  format        h264 1280x720 yuv420p (8-bit)
+  HDR metadata  none
 
 [ERR ] CT301  Labelled limited range, pixels look full range  (confidence: high)
-       Luma reaches 0..255 including reserved codes (0/255 in 8-bit). Limited-range black
-       is 16 and white is 235. Players will stretch these values again: crushed shadows
-       and clipped highlights.
+       Luma reaches 0..255 including reserved codes (0/255 in 8-bit). Limited-range black is 16
+       and white is 235. Players will stretch these values again: crushed shadows and clipped highlights.
+       hint: If the pixels are right, retag as full range (no re-encode). If the label is right, convert pixels to limited.
 
 Proposed (retag, no re-encode): Label the file as full range (pixels unchanged)
-  $ ffmpeg -n -i clip.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 -color_range pc clip.fullrange.mp4
+  why: Use this if the pixels are correct and only the flag is wrong.
+  $ ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 -color_range pc zoo/full_pixels_labelled_limited.fullrange.mp4
+
+Proposed (convert, re-encodes): Convert the pixels to limited range (label unchanged)
+  why: Use this if the delivery spec requires limited range. Costs one encode generation.
+  note: libx264 output; swap the encoder and quality settings for your delivery spec
+  $ ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -vf scale=in_range=full:out_range=limited -c:v libx264 -crf 16 -preset slow -color_range tv zoo/full_pixels_labelled_limited.limited.mp4
 
 Nothing was changed. Review a command, then run it yourself.
+
+1 error · 0 warn · 0 info
 ```
+
+(Real output from the [mislabel zoo](docs/09-mislabel-zoo.md), FFmpeg 9.0.2. Long lines are wrapped here.)
 
 ## Why
 
-Every tool reads the label. Open tools don't check whether the label matches the picture, so a wrong flag turns into grey blacks on the web, crushed shadows on a phone, and an afternoon of forum detective work. Read [docs/00-why.md](docs/00-why.md) for the full story and what already exists.
+Every tool reads the label. Open tools don't check whether the label matches the picture, so a wrong flag turns into washed-out blacks on one screen and crushed shadows on another, and nobody knows which file to blame. Read [docs/00-why.md](docs/00-why.md) for the full story and what already exists.
 
 ## Quick start
 
@@ -49,7 +62,7 @@ pip install -e ".[dev,mcp]"
 python scripts/make_zoo.py samples      # build synthetic test clips with known mislabels
 chromaverity inspect samples/full_pixels_labelled_limited.mp4
 chromaverity diff samples/good_limited_709.mp4 samples/hop_dropped_tags.mp4
-pytest                                  # 40 tests
+pytest                                  # the test suite; pure tests run even without FFmpeg
 ```
 
 On **Windows** (PowerShell), only the setup lines differ. The `make_zoo`, `chromaverity` and `pytest` lines are the same:
@@ -98,13 +111,8 @@ chromaverity reads files and starts `ffprobe`/`ffmpeg`. It never writes, deletes
 
 Contributions are welcome, from a typo fix to a new pixel check. See [CONTRIBUTING.md](CONTRIBUTING.md). Found a real file chromaverity got wrong? That's our favorite kind of issue ([how to report it](docs/09-mislabel-zoo.md#contributing-a-case)).
 
-## Spine check
+## Where next
 
-| Spine | Depth | Findings (must / should / could) | Decision |
-|---|---|---|---|
-| NET | lite | n/a: no network access; FFmpeg restricted to `file:` | n/a |
-| SEC | standard | must: done (no shell, protocol lock, path gate, timeouts, read-only MCP). should: Dockerfile for untrusted batches; pin dev deps + Dependabot; SBOM at first release | should items in ROADMAP |
-| CLOUD/ML | lite | should: record FFmpeg version in reports; publish timing per resolution. could: learned classifier once the zoo is a dataset | deferred to v0.2 |
-| DELIVERY | standard | Sprint 1 goal met if CI is green from a clean clone. should: tag v0.1.0 after first public review | pending |
-
-Reviewed: 2026-10-13 · Decided by: Mark
+- Run it on one of your own files and read the `evidence` block in `--json`: the numbers are the point.
+- [docs/06](docs/06-checks-reference.md) says what each finding means and what to do about it.
+- [ROADMAP.md](ROADMAP.md) has what's coming; the [work orders](docs/work-orders/) show how maintenance gets done here.

@@ -33,24 +33,36 @@ from pathlib import Path
 from typing import Any
 
 from chromaverity import report
+from chromaverity.essence.range_check import DEFAULT_SAMPLE_FRAMES
+from chromaverity.report import plain
 from chromaverity.safety import ToolError, UnsafeInput, checked_media_path
+
+# An agent can ask for more frames than the CLI default, but not without limit:
+# each one is a decode, and a 4K file at 240 frames is already a minute of work.
+MAX_MCP_FRAMES = 240
 
 
 def _refusal(exc: Exception) -> dict[str, Any]:
     # Return the reason as data so the agent can tell the person what happened,
     # instead of a generic tool failure it can only guess about.
-    return {"error": type(exc).__name__, "message": str(exc)}
+    return {"error": type(exc).__name__, "message": plain(str(exc))}
 
 
 def build_server(root: Path) -> Any:
     try:
         from mcp.server.mcpserver import MCPServer
     except ImportError as exc:  # pragma: no cover - depends on optional extra
-        raise SystemExit(
+        raise ToolError(
             "The MCP server needs the optional extra: pip install 'chromaverity[mcp]'"
         ) from exc
 
     root = root.expanduser().resolve()
+
+    def under_root(raw: str) -> Path:
+        # Agents usually pass bare names ("clip.mp4"). Those are relative to the
+        # folder the server was given, not to wherever the process happens to run.
+        p = Path(raw).expanduser()
+        return checked_media_path(p if p.is_absolute() else root / p, allowed_root=root)
     server = MCPServer(
         name="chromaverity",
         instructions=(
@@ -61,14 +73,14 @@ def build_server(root: Path) -> Any:
     )
 
     @server.tool()
-    def chromaverity_inspect(path: str, frames: int = 24) -> dict[str, Any]:
+    def chromaverity_inspect(path: str, frames: int = DEFAULT_SAMPLE_FRAMES) -> dict[str, Any]:
         """Lint one video's color label and check its range against the pixels.
 
         Returns findings (id, severity, confidence, evidence) and proposed FFmpeg
         fix commands as text. Nothing is modified.
         """
         try:
-            return report.inspect(checked_media_path(path, allowed_root=root), frames=max(1, min(frames, 240)))
+            return report.inspect(under_root(path), frames=max(1, min(frames, MAX_MCP_FRAMES)))
         except (UnsafeInput, ToolError, ValueError) as exc:
             return _refusal(exc)
 
@@ -80,10 +92,7 @@ def build_server(root: Path) -> Any:
         dropped or changed.
         """
         try:
-            return report.diff(
-                checked_media_path(before, allowed_root=root),
-                checked_media_path(after, allowed_root=root),
-            )
+            return report.diff(under_root(before), under_root(after))
         except (UnsafeInput, ToolError, ValueError) as exc:
             return _refusal(exc)
 

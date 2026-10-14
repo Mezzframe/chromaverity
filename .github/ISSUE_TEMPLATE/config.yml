@@ -1,0 +1,6 @@
+# Shown at the top of "New issue". Security reports must not become public issues.
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security problem (private)
+    url: https://github.com/Novapakt/chromaverity/security/advisories/new
+    about: Private vulnerability reporting. See SECURITY.md for what to include.

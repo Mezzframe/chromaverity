@@ -43,7 +43,7 @@ def diff(before: ColorTags, after: ColorTags) -> list[Finding]:
                 fix_hint=(
                     "Pass the flag explicitly on the encoder, or retag the output "
                     "(see `chromaverity inspect` on the output for a proposed command)."
-                    if verb != "added"
+                    if verb != "added" and name not in ("pix_fmt", "bit_depth")
                     else None
                 ),
             )

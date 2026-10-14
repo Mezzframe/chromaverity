@@ -38,8 +38,9 @@ ffprobe -v error -protocol_whitelist file -select_streams v:0 \
 ## 2. Measuring the pixels (range_check.py)
 
 ```bash
-ffmpeg -hide_banner -v error -nostdin -protocol_whitelist file -i file:/abs/clip.mp4 \
-       -map 0:v:0 -vf "fps=1,signalstats=stat=brng,metadata=mode=print:file=-" \
+ffmpeg -hide_banner -v error -nostdin -protocol_whitelist file -format_whitelist mov,mp4,... \
+       -i file:/abs/clip.mp4 \
+       -map 0:v:0 -vf "fps=0.04,signalstats=stat=brng,metadata=mode=print:file=-" \
        -frames:v 24 -f null -
 ```
 
@@ -47,9 +48,11 @@ ffmpeg -hide_banner -v error -nostdin -protocol_whitelist file -i file:/abs/clip
 |---|---|---|
 | `-hide_banner` | global | Skip the build banner |
 | `-nostdin` | global | Never read the keyboard; FFmpeg otherwise listens for `q`, which can hang a subprocess |
+| `-protocol_whitelist file` | input option | Only the plain file protocol, even for references inside the file |
+| `-format_whitelist mov,mp4,...` | input option | Only real containers. A playlist (HLS, DASH, concat) would make FFmpeg open other files; those demuxers are not on the list (see [07](07-security.md), T2b) |
 | `-map 0:v:0` | output option | Use only input 0's first video stream |
 | `-vf "..."` | output option | A filter chain; filters run left to right, separated by commas |
-| `fps=1` | filter | One frame per second, so the sample spans the clip |
+| `fps=0.04` | filter | Frames per second to keep. We set it to `frames / duration` (here 24 frames over a 10-minute clip), so the samples spread across the whole programme instead of the first 24 seconds. A leader of bars or black then can't carry the verdict on its own. The number used is in the report's `evidence.sample_fps` |
 | `signalstats=stat=brng` | filter + option | Measures YMIN/YMAX etc.; `stat=brng` adds the out-of-broadcast-range figure |
 | `metadata=mode=print:file=-` | filter + options | Print each frame's measurements; `file=-` means stdout |
 | `-frames:v 24` | output option | Stop after 24 frames leave the filter chain |
@@ -102,7 +105,12 @@ chromaverity mcp [--root DIR]
 |---|---|
 | 0 | No findings at or above `--fail-on` (default `error`) |
 | 1 | Findings at or above `--fail-on` |
-| 3 | FFmpeg missing, failed, timed out, or no video stream |
-| 4 | Input path refused (URL, directory, missing, outside `--root`) |
+| 2 | Bad command line (argparse's own code: unknown flag, missing argument) |
+| 3 | FFmpeg missing, failed or timed out; no video stream; `--out` could not be written |
+| 4 | A path was refused: the input is a URL, directory or missing file, or `--out` points at one of the inputs |
+
+The MCP server has no exit codes. A refused path comes back to the agent as data: `{"error": "UnsafeInput", "message": "..."}`.
+
+`--frames N` picks how many frames the range check decodes (default 24), spread evenly across the clip. `CHROMAVERITY_TIMEOUT` (seconds, default 120) caps every FFmpeg call; raise it for long 4K files on a slow disk. `--version` prints the version, and `python -m chromaverity ...` runs the tool before it's installed.
 
 CI example: `chromaverity inspect out.mp4 --fail-on warn --out qc.json` fails the job on any warning and keeps the report as an artifact.

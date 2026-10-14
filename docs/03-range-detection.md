@@ -2,7 +2,7 @@
 
 **Question:** is this video really limited range or full range, whatever the label says?
 
-**Code:** `src/chromaverity/essence/range_check.py` · **Tests:** `tests/test_range_classifier.py`, `tests/test_end_to_end.py`
+**Code:** `src/chromaverity/essence/range_check.py` · **Tests:** `tests/test_range_classifier.py` (rules on made-up numbers), `tests/test_end_to_end.py` (the zoo, and a clip with a black leader)
 
 ## Method
 
@@ -19,11 +19,13 @@ We sample frames across the clip and run FFmpeg's `signalstats` filter, the same
 Two details matter:
 
 1. **No conversion before measuring.** We never let FFmpeg scale or convert the pixels first, so we see the stored code values, not a player's interpretation of them.
-2. **Sampling.** `fps=1` takes one frame per second and we stop at 24 (change with `--frames`). This covers the clip without decoding every frame. A clip with one bright shot in a long dark program can be missed; more frames helps ⟨assumption: a smarter sampler, e.g. scene-change based, is a good contribution⟩.
+2. **Sampling.** We take 24 frames (change with `--frames`) spread evenly across the clip: the `fps` filter is set to `frames / duration`, so a 10-minute programme is sampled every 25 seconds. A leader of bars or black can't carry the verdict on its own (tested with a 30 s black leader). A clip with one bright shot in a long dark programme can still be missed; more frames helps ⟨assumption: a smarter sampler, e.g. scene-change based, is a good contribution⟩. The rate used is in the report as `evidence.sample_fps`.
 
 ### Classify
 
-All thresholds are 8-bit code values, scaled by 2^(bits-8) for 10/12-bit.
+The measurement gives us, per frame, the darkest and brightest luma values. Classifying means asking: do these sit where limited-range content sits (16 and 235), or where full-range content sits (0 and 255)? The table below is the whole rulebook; the "Why this number" column is where broadcast experience comes in.
+
+All thresholds are 8-bit code values, scaled by 2^(bits-8) for 10/12-bit (so at 10-bit, black is 64 and white is 940).
 
 | Name | Value | Why this number |
 |---|---|---|
@@ -49,6 +51,12 @@ confidence (looks_limited):
    both bands hit on ≥ max(2, frames/4) frames  ──► medium
    otherwise                                    ──► low
    (never high: graded content can sit at 16/235 on purpose)
+
+agrees (CT304):
+   labelled full     and looks_full
+   labelled limited  and not looks_full  and at least ONE band hit
+   (one end is enough for a limited label: plenty of limited-range content
+    never reaches white, and we only need to see that it isn't full)
 ```
 
 | Label | Pixels look | Finding | Severity |
@@ -62,17 +70,25 @@ confidence (looks_limited):
 
 ## Measured on the synthetic zoo
 
-From `pytest` on 2026-10-13, FFmpeg 6.1.1, libx264, CRF 18, 1280×720 test pattern with pure white and black boxes:
+`chromaverity inspect --json` on every zoo clip, 2026-10-14, FFmpeg 9.0.2, libx264, CRF 18, 1280×720 test pattern with pure white and black boxes, 24 frames each:
 
 | Clip | Label | Truth | Verdict | Luma min..max |
 |---|---|---|---|---|
-| good_limited_709 | tv | tv | CT304 agrees | 16..235 |
-| good_full_709 | pc | pc | CT304 agrees | 0..255 |
+| good_limited_709 | tv | tv | CT304 agrees, medium | 13..235 |
+| good_full_709 | pc | pc | CT304 agrees, medium | 0..255 |
 | full_pixels_labelled_limited | tv | pc | **CT301 error, high** | 0..255 |
-| limited_pixels_labelled_full | pc | tv | **CT302 warn, medium** | 16..235 |
-| full_pixels_unlabelled | none | pc | **CT303 warn** | 0..255 |
+| limited_pixels_labelled_full | pc | tv | **CT302 warn, medium** | 13..235 |
+| full_pixels_unlabelled | none | pc | **CT303 warn, high** | 0..255 |
+| hd_labelled_601 | tv | tv | CT304 agrees, medium (the mislabel here is the matrix: CT102) | 13..235 |
+| hop_dropped_tags | tv | tv | CT304 agrees, medium (the mislabel here is the dropped flags: CT201 in `diff`) | 13..235 |
+
+Black lands at 13, not 16: that's lossy encoding noise, and exactly why the limited black band is 12..20 rather than a single value.
 
 **What this does not show.** Synthetic test patterns have perfect blacks and whites in every frame, which is the easiest possible case. Real footage is harder. We haven't measured accuracy on real content yet; that's the job of the [mislabel zoo](09-mislabel-zoo.md) v0.2. Every report records which FFmpeg produced it (`ffmpeg.version`), so results from different machines can be compared fairly.
+
+## Untested so far ⟨assumption⟩
+
+The zoo is 8-bit H.264 in MP4. These paths exist in the code but have no ground-truth clip yet, so treat verdicts on them as assumptions until the v0.2 zoo covers them: 10- and 12-bit (threshold scaling), MOV, MKV and MXF containers, files with several video streams (we read only the first), Dolby Vision and HDR10+ (their dynamic metadata isn't read at all), and RGB pixel formats (`signalstats` wants Y'CbCr and FFmpeg may convert on its own ⟨verify⟩).
 
 ## Where it fails (on purpose, and not)
 

@@ -24,6 +24,7 @@ Read docs/01-color-primer.md for the background.
 
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
@@ -84,7 +85,8 @@ class ColorTags:
     # first thing a careless transcode drops. We record presence only in v0.1.
     has_mastering_display: bool = False
     has_content_light_level: bool = False
-    # Anything odd we noticed while parsing, kept for the report.
+    # Reserved for parser remarks. Nothing writes it in 0.1, so it's always [],
+    # but it's in every report already and removing a field is a schema break.
     notes: list[str] = field(default_factory=list)
 
     @classmethod
@@ -129,12 +131,43 @@ class ColorTags:
         return [name for name in core if getattr(self, name) is None]
 
 
+# Pixel formats whose name doesn't follow the "...p10le" pattern. Packed RGB
+# names give bits per *pixel* (rgb48 = 3 x 16), so they need spelling out.
+_DEPTH_BY_NAME = {
+    "v210": 10, "nv20": 10, "xv30": 10, "xv36": 12,
+    "y210": 10, "y212": 12, "y216": 16,
+    "x2rgb10": 10, "x2bgr10": 10,
+    "rgb48": 16, "bgr48": 16, "rgba64": 16, "bgra64": 16, "ya16": 16,
+}
+_PLANAR_DEPTH = re.compile(r"(?:p|gray|ya)(9|1[0246])$")   # yuv420p10, gbrp12, gray16
+_SEMI_PLANAR_DEPTH = re.compile(r"p[024](1[026])$")        # p010, p216, p416
+
+
+def bit_depth_from_pix_fmt(pix_fmt: str) -> int | None:
+    """Bits per sample from a pixel format name. Pure, so it can be tested on names alone.
+
+    Common shapes: `yuv420p10le` (planar, depth after the p), `p010le`
+    (semi-planar, depth in the last two digits), `gray12le`, and a few packed
+    names in the table above. Anything else with a name is treated as 8-bit,
+    which is right for yuv420p, nv12, rgb24 and friends. An empty name gives
+    None: we don't know.
+    """
+    if not pix_fmt:
+        return None
+    base = re.sub(r"(le|be)$", "", pix_fmt)
+    if base in _DEPTH_BY_NAME:
+        return _DEPTH_BY_NAME[base]
+    m = _SEMI_PLANAR_DEPTH.fullmatch(base) or _PLANAR_DEPTH.search(base)
+    return int(m.group(1)) if m else 8
+
+
 def _bit_depth(stream: dict[str, Any]) -> int | None:
     """Work out bits per sample.
 
     ffprobe gives `bits_per_raw_sample` for many codecs but not all. When it's
-    missing we read it off the pixel format name (yuv420p10le -> 10). Plain
-    names like yuv420p mean 8-bit.
+    missing we read it off the pixel format name. Getting this wrong matters:
+    the range thresholds scale by 2**(bits-8), so a 10-bit clip read as 8-bit
+    looks like it has impossibly hot whites.
     """
     raw = stream.get("bits_per_raw_sample")
     if raw not in (None, "", "N/A"):
@@ -142,11 +175,7 @@ def _bit_depth(stream: dict[str, Any]) -> int | None:
             return int(raw)
         except (TypeError, ValueError):
             pass
-    pix = str(stream.get("pix_fmt") or "")
-    for depth in (16, 14, 12, 10, 9):
-        if f"p{depth}" in pix:
-            return depth
-    return 8 if pix else None
+    return bit_depth_from_pix_fmt(str(stream.get("pix_fmt") or ""))
 
 
 def friendly(value: str | None) -> str:

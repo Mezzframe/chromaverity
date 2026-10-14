@@ -94,3 +94,77 @@ def test_cli_json_is_valid(zoo):
     rep = json.loads(out)
     assert rep["schema_version"] == "0.1"
     assert rep["kind"] == "inspect"
+
+
+def test_out_pointing_at_an_input_is_refused_and_the_file_is_untouched(zoo, tmp_path):
+    clip = tmp_path / "keep.mp4"
+    clip.write_bytes((zoo / "good_limited_709.mp4").read_bytes())
+    before = clip.read_bytes()
+    assert main(["inspect", str(clip), "--frames", "2", "--out", str(clip)]) == 4
+    assert clip.read_bytes() == before
+
+
+def test_unwritable_out_exits_3_not_1(zoo, tmp_path):
+    # Exit 1 means "findings"; a missing folder is an error and must not look like one.
+    assert main(["inspect", str(zoo / "good_limited_709.mp4"), "--frames", "2",
+                 "--out", str(tmp_path / "no_such_dir" / "r.json")]) == 3
+
+
+def test_fail_on_levels(zoo):
+    good = str(zoo / "good_limited_709.mp4")
+    bad = str(zoo / "full_pixels_labelled_limited.mp4")
+    assert main(["inspect", good, "--frames", "2", "--fail-on", "info"]) == 1   # CT304 is info
+    assert main(["inspect", bad, "--frames", "2", "--fail-on", "never"]) == 0
+
+
+def test_diff_exit_codes(zoo):
+    args = ["diff", str(zoo / "good_limited_709.mp4"), str(zoo / "hop_dropped_tags.mp4")]
+    assert main(args) == 0                        # CT201 is warn; default --fail-on is error
+    assert main([*args, "--fail-on", "warn"]) == 1
+
+
+def test_mcp_accepts_bare_filenames_relative_to_root(zoo):
+    pytest.importorskip("mcp")
+    import asyncio
+
+    from chromaverity.mcp_server import build_server
+
+    server = build_server(zoo)
+    ok = asyncio.run(server.call_tool("chromaverity_inspect", {"path": "good_limited_709.mp4", "frames": 2}))
+    assert "CT304" in str(ok)
+    refused = asyncio.run(server.call_tool("chromaverity_inspect", {"path": "../outside.mp4"}))
+    assert "outside the allowed folder" in str(refused) or "does not exist" in str(refused)
+
+
+def test_a_black_leader_does_not_hide_a_full_range_body(zoo, tmp_path):
+    """40 s clip: 30 s of limited-level black, then 10 s of full-range picture, labelled limited.
+
+    Sampling only the first N seconds would see black at code 16 and call the
+    label fine. Spreading the samples across the clip finds the full-range body.
+    (`zoo` is only requested so the test skips cleanly without FFmpeg/libx264.)
+    """
+    limited = "scale=out_color_matrix=bt709:out_range=tv,format=yuv420p"
+    stretch = ("lutyuv=y='clip((val-16)*255/219,0,255)':u='clip((val-128)*255/224+128,0,255)'"
+               ":v='clip((val-128)*255/224+128,0,255)'")
+    body = ("testsrc2=size=320x180:rate=5:duration=10,"
+            "drawbox=x=0:y=0:w=40:h=40:color=white:t=fill,drawbox=x=40:y=0:w=40:h=40:color=black:t=fill")
+    raw, clip = tmp_path / "raw.mp4", tmp_path / "leader.mp4"
+    subprocess.run(
+        ["ffmpeg", "-hide_banner", "-v", "error", "-y",
+         "-f", "lavfi", "-i", "color=black:size=320x180:rate=5:duration=30",
+         "-f", "lavfi", "-i", body,
+         "-filter_complex", f"[0:v]{limited}[a];[1:v]{limited},{stretch}[b];[a][b]concat=n=2:v=1:a=0,"
+         "setparams=range=unknown:color_primaries=unknown:color_trc=unknown:colorspace=unknown",
+         "-c:v", "libx264", "-crf", "18", "-preset", "veryfast", str(raw)],
+        check=True,
+    )
+    subprocess.run(
+        ["ffmpeg", "-hide_banner", "-v", "error", "-y", "-i", str(raw), "-c", "copy",
+         "-bsf:v", "h264_metadata=video_full_range_flag=0:colour_primaries=1:transfer_characteristics=1"
+         ":matrix_coefficients=1", "-color_range", "tv", str(clip)],
+        check=True,
+    )
+    rep = report.inspect(clip, frames=8)
+    ct3 = next(f for f in rep["findings"] if f["id"].startswith("CT3"))
+    assert ct3["id"] == "CT301", ct3
+    assert ct3["evidence"]["sample_fps"] == 0.2  # 8 frames over 40 s
