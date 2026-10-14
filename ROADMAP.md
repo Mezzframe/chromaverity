@@ -33,7 +33,7 @@ Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order
 - Scene-aware frame sampling
 - Batch mode and an HTML report for archives
 - Chroma siting check (CT33x)
-- GitHub Action wrapper: `uses: <org>/chromaverity-action`
+- GitHub Action wrapper: `uses: Novapakt/chromaverity-action`
 
 ## Content angles
 - "Your file says BT.709. The pixels disagree." (short video, the same frame decoded both ways)

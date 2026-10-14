@@ -32,7 +32,9 @@ chromaverity = "chromaverity.cli:main"
 
 [project.urls]
 Homepage = "https://mezzframe.ai"
-# Repository = "https://github.com/<org>/chromaverity"   # fill in when the repo exists
+Repository = "https://github.com/Novapakt/chromaverity"
+Issues = "https://github.com/Novapakt/chromaverity/issues"
+Changelog = "https://github.com/Novapakt/chromaverity/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling>=1.27"]
