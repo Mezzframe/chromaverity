@@ -194,7 +194,7 @@ def propose(src: Path, tags: ColorTags, findings: list[Finding]) -> list[Propose
                     title="Fill blank labels with BT.709 (pixels unchanged)",
                     why="Most HD SDR content is BT.709. Only use this if you know that's what it was made as.",
                     command=cmd,
-                    assumptions=["⟨assumption⟩ the content is HD SDR made in BT.709"],
+                    assumptions=["Assumes the content is HD SDR made in BT.709"],
                 ))
     return fixes
 

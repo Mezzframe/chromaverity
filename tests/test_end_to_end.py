@@ -6,6 +6,7 @@ disagreed with a label we wrote ourselves.
 """
 
 import json
+import os
 import subprocess
 import sys
 
@@ -64,6 +65,19 @@ def test_diff_catches_dropped_tags(zoo):
     rep = report.diff(zoo / "good_limited_709.mp4", zoo / "hop_dropped_tags.mp4")
     dropped = {f["evidence"]["field"] for f in rep["findings"] if f["id"] == "CT201"}
     assert {"color_primaries", "color_transfer", "color_space"} <= dropped
+
+
+def test_text_output_survives_a_non_unicode_console(zoo, tmp_path):
+    """Windows pipes use a legacy code page (cp1252); a Japanese filename must not crash the report."""
+    clip = tmp_path / "クリップ.mp4"
+    clip.write_bytes((zoo / "full_pixels_unlabelled.mp4").read_bytes())
+    env = {**os.environ, "PYTHONIOENCODING": "cp1252"}
+    proc = subprocess.run(
+        [sys.executable, "-m", "chromaverity", "inspect", str(clip), "--frames", "4", "--fail-on", "never"],
+        capture_output=True, env=env,
+    )
+    assert proc.returncode == 0, proc.stderr.decode("cp1252", "replace")
+    assert b"Proposed" in proc.stdout
 
 
 def test_cli_exit_codes(zoo, capsys):
