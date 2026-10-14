@@ -5,7 +5,8 @@ type: software
 authors:
   - name: "Mezzframe open lab"
 license: Apache-2.0
-version: 0.1.0.dev0
+version: 0.1.0
+date-released: "2026-10-14"
 url: "https://mezzframe.ai"
 repository-code: "https://github.com/Novapakt/chromaverity"
 keywords: [video, color, ffmpeg, broadcast, quality-control, mcp]

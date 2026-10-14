@@ -4,6 +4,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-14
+
+First release. Everything below is new in 0.1.0; the Security, Fixed, Changed and Removed sections describe changes made during the pre-release hardening (WO-001, WO-002), kept so the history of each decision is readable.
+
 ### Security
 - A playlist file (`.m3u8`) saved under the MCP `--root` could make ffprobe read files outside that folder: `-protocol_whitelist file` still lets FFmpeg follow `file:` entries inside the input (measured on FFmpeg 9.0.2). Both FFmpeg calls now also pass `-format_whitelist` with the containers we read; playlist demuxers (HLS, DASH, concat) are not on it. Files in other containers (raw `.h264`, `.y4m`, images) are refused with exit 3 where they used to be read.
 - Text output and error messages replace terminal control characters in filenames and commands with `?` (`report.plain()`), so a crafted filename can't rewrite the window title or hide text. JSON output was already escaped.
@@ -42,6 +46,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 - `report.from_tags_only()`: no callers and no documented library API.
 
 ### Added
+- Release workflow (`.github/workflows/release.yml`): publishing a GitHub release builds the package, checks the tag matches the version, and uploads to PyPI with Trusted Publishing (no stored token). Steps in `docs/release.md`.
 - `evidence.looks_full` and `evidence.sample_fps` on CT30x findings; `ffmpeg.version` documented as `{"version": null}` when unreadable. New fields, no schema bump.
 - Tests: `tests/test_fixes.py` (pure tests for every proposed-fix path, including that no metadata string can reach a command); `safety.run()` timeout, exit-tail and UTF-8 cases; symlink and sibling-prefix root escapes; the playlist escape; bit depth per pixel format; the remaining lint rules and their negatives; CLI exit codes for `--out` and `--fail-on`; MCP relative paths; the black-leader clip. 111 tests, up from 44.
 - `.github/ISSUE_TEMPLATE/config.yml` points security reports at the private form.
@@ -59,3 +64,6 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 - JSON report, schema 0.1.
 - `scripts/make_zoo.py`: synthetic mislabel zoo v0.1 (7 clips).
 - Educational docs (00-10, glossary, 4 ADRs), CI, gitleaks pre-commit hook.
+
+[Unreleased]: https://github.com/Novapakt/chromaverity/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Novapakt/chromaverity/releases/tag/v0.1.0

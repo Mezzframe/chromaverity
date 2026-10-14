@@ -2,7 +2,7 @@
   "schema_version": "0.1",
   "tool": {
     "name": "chromaverity",
-    "version": "0.1.0.dev0"
+    "version": "0.1.0"
   },
   "ffmpeg": {
     "version": "9.0.2"

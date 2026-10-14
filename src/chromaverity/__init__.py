@@ -6,7 +6,7 @@ The package is split so that each module does one job you can explain in a
 sentence. See docs/02-how-it-works.md for the map.
 """
 
-__version__ = "0.1.0.dev0"
+__version__ = "0.1.0"
 
 # The report format has its own version, separate from the package version.
 # Agents and scripts parse reports; bump this only when a field changes meaning
