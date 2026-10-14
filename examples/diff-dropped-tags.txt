@@ -1,4 +1,4 @@
-chromaverity 0.1.0.dev0  ·  diff
+chromaverity 0.1.0.dev0  ·  FFmpeg 9.0.2  ·  diff
   before: zoo/good_limited_709.mp4
   after:  zoo/hop_dropped_tags.mp4
 

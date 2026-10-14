@@ -72,7 +72,7 @@ From `pytest` on 2026-10-13, FFmpeg 6.1.1, libx264, CRF 18, 1280×720 test patte
 | limited_pixels_labelled_full | pc | tv | **CT302 warn, medium** | 16..235 |
 | full_pixels_unlabelled | none | pc | **CT303 warn** | 0..255 |
 
-**What this does not show.** Synthetic test patterns have perfect blacks and whites in every frame, which is the easiest possible case. Real footage is harder. We haven't measured accuracy on real content yet; that's the job of the [mislabel zoo](09-mislabel-zoo.md) v0.2.
+**What this does not show.** Synthetic test patterns have perfect blacks and whites in every frame, which is the easiest possible case. Real footage is harder. We haven't measured accuracy on real content yet; that's the job of the [mislabel zoo](09-mislabel-zoo.md) v0.2. Every report records which FFmpeg produced it (`ffmpeg.version`), so results from different machines can be compared fairly.
 
 ## Where it fails (on purpose, and not)
 
