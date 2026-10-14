@@ -4,6 +4,8 @@ Everything you need to follow the rest of the docs, explained from scratch. If y
 
 ## The pipeline from light to numbers and back
 
+The diagram below has four words you may not know yet: **transfer (OETF)** is the curve that turns light into numbers ("gamma"), **matrix** turns red-green-blue into brightness-plus-color-difference, **quantize** rounds to integers, and **range** says which integers mean black and white. Each gets its own section below, and the [glossary](glossary.md) has one-line versions.
+
 ```
  scene light ─► camera RGB ─► transfer (OETF) ─► R'G'B' ─► matrix ─► Y'CbCr ─► quantize ─► code values in the file
                                  "gamma"                     601/709/2020       range: limited or full
@@ -77,5 +79,5 @@ HDR10 adds static metadata beside the four flags: **mastering display** (the gra
 - ITU-T H.273, *Coding-independent code points for video signal type identification* ⟨verify edition⟩
 - ITU-R BT.709, BT.601, BT.2020, BT.2100 (free from itu.int)
 - EBU R 103, *Video signal tolerance in digital television systems*
-- In the Mezzframe study guide: ch. 2 §4, §8-9, §12 (color signalling)
+- The Mezzframe broadcast study guide (internal, not yet published): ch. 2 §4, §8-9, §12 on color signalling
 - FFmpeg filter docs for `scale` (`in_range`, `out_range`, `out_color_matrix`) and `signalstats`

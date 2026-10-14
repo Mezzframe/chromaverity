@@ -35,6 +35,22 @@ Every finding ID chromaverity can emit. IDs are stable: once used, an ID never c
 
 Method and thresholds: [03 Range detection](03-range-detection.md).
 
+## What to do with a finding
+
+**CT2xx (something changed at a hop).** The fix belongs upstream: whatever made the `after` file should be told the flags explicitly (`-color_primaries bt709 -color_trc bt709 -colorspace bt709 -color_range tv` on FFmpeg, or the equivalent export setting). If you can't re-run the hop, run `chromaverity inspect` on the `after` file: a CT101 there comes with a proposed retag.
+
+**CT3xx (pixels and label disagree).** You get two kinds of proposal, and only someone who knows the file's history can pick:
+
+| If... | Then | Proposal |
+|---|---|---|
+| The pixels are right and the flag is the lie (most common: a tool wrote the wrong flag or none) | Change the label | **retag**: no re-encode, no quality loss, seconds |
+| The label is what the delivery spec demands and the pixels are the lie (a scale step used the wrong range) | Change the pixels | **convert**: re-encode through a `scale` filter. Costs one generation |
+| You don't know | Look at a frame. Full-range pixels played as limited look crushed and oversaturated; limited played as full look washed out | Try the retag first (it's reversible: just retag back) |
+
+When `inspect` proposes **two retags** (say `.fullrange.mp4` for CT303 and `.bt709.mp4` for CT101), each fixes one part of the label. Run one, then run `inspect` on its output and apply the other to that. Or merge the two `h264_metadata=` option strings into one command with `:` between them.
+
+**CT300 (inconclusive)** is an honest answer, not a pass. Try `--frames 60`, or a clip with true blacks and whites, before deciding.
+
 ## Reserved for the roadmap
 
 | Range | Planned check |

@@ -4,7 +4,7 @@
 
 chromaverity checks whether a video's color label (primaries, transfer, matrix, range) matches what's actually in the picture. It reads the label, checks it across processing hops, measures the pixels, and tells you where they disagree, how sure it is, and the FFmpeg command that would fix it. It runs from the command line, in CI, or as an MCP tool that AI agents can call to check their own transcodes.
 
-An open tool from the [Mezzframe](https://mezzframe.ai) lab · Encode topic · v0.1 (pre-alpha)
+An open tool from the [Mezzframe](https://mezzframe.ai) lab, published from the maintainer's GitHub account (Novapakt) · Encode topic · v0.1 (pre-alpha)
 
 ```
 $ chromaverity inspect zoo/full_pixels_labelled_limited.mp4
@@ -41,7 +41,7 @@ Nothing was changed. Review a command, then run it yourself.
 
 ## Why
 
-Every tool reads the label. Open tools don't check whether the label matches the picture, so a wrong flag turns into grey blacks on the web, crushed shadows on a phone, and an afternoon of forum detective work. Read [docs/00-why.md](docs/00-why.md) for the full story and what already exists.
+Every tool reads the label. Open tools don't check whether the label matches the picture, so a wrong flag turns into washed-out blacks on one screen and crushed shadows on another, and nobody knows which file to blame. Read [docs/00-why.md](docs/00-why.md) for the full story and what already exists.
 
 ## Quick start
 
@@ -111,13 +111,8 @@ chromaverity reads files and starts `ffprobe`/`ffmpeg`. It never writes, deletes
 
 Contributions are welcome, from a typo fix to a new pixel check. See [CONTRIBUTING.md](CONTRIBUTING.md). Found a real file chromaverity got wrong? That's our favorite kind of issue ([how to report it](docs/09-mislabel-zoo.md#contributing-a-case)).
 
-## Spine check
+## Where next
 
-| Spine | Depth | Findings (must / should / could) | Decision |
-|---|---|---|---|
-| NET | lite | n/a: no network access; FFmpeg restricted to `file:` | n/a |
-| SEC | standard | must: done (no shell, protocol lock, path gate, timeouts, read-only MCP). should: Dockerfile for untrusted batches; pin dev deps + Dependabot; SBOM at first release | should items in ROADMAP |
-| CLOUD/ML | lite | should: record FFmpeg version in reports; publish timing per resolution. could: learned classifier once the zoo is a dataset | deferred to v0.2 |
-| DELIVERY | standard | Sprint 1 goal met if CI is green from a clean clone. should: tag v0.1.0 after first public review | pending |
-
-Reviewed: 2026-10-13 · Decided by: Mark
+- Run it on one of your own files and read the `evidence` block in `--json`: the numbers are the point.
+- [docs/06](docs/06-checks-reference.md) says what each finding means and what to do about it.
+- [ROADMAP.md](ROADMAP.md) has what's coming; the [work orders](docs/work-orders/) show how maintenance gets done here.

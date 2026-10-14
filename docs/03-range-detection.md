@@ -23,7 +23,9 @@ Two details matter:
 
 ### Classify
 
-All thresholds are 8-bit code values, scaled by 2^(bits-8) for 10/12-bit.
+The measurement gives us, per frame, the darkest and brightest luma values. Classifying means asking: do these sit where limited-range content sits (16 and 235), or where full-range content sits (0 and 255)? The table below is the whole rulebook; the "Why this number" column is where broadcast experience comes in.
+
+All thresholds are 8-bit code values, scaled by 2^(bits-8) for 10/12-bit (so at 10-bit, black is 64 and white is 940).
 
 | Name | Value | Why this number |
 |---|---|---|
@@ -83,6 +85,10 @@ agrees (CT304):
 Black lands at 13, not 16: that's lossy encoding noise, and exactly why the limited black band is 12..20 rather than a single value.
 
 **What this does not show.** Synthetic test patterns have perfect blacks and whites in every frame, which is the easiest possible case. Real footage is harder. We haven't measured accuracy on real content yet; that's the job of the [mislabel zoo](09-mislabel-zoo.md) v0.2. Every report records which FFmpeg produced it (`ffmpeg.version`), so results from different machines can be compared fairly.
+
+## Untested so far ⟨assumption⟩
+
+The zoo is 8-bit H.264 in MP4. These paths exist in the code but have no ground-truth clip yet, so treat verdicts on them as assumptions until the v0.2 zoo covers them: 10- and 12-bit (threshold scaling), MOV, MKV and MXF containers, files with several video streams (we read only the first), Dolby Vision and HDR10+ (their dynamic metadata isn't read at all), and RGB pixel formats (`signalstats` wants Y'CbCr and FFmpeg may convert on its own ⟨verify⟩).
 
 ## Where it fails (on purpose, and not)
 

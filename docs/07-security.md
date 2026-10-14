@@ -25,6 +25,8 @@
 
 ## Threats (STRIDE-style)
 
+STRIDE is a checklist of six threat types (spoofing, tampering, repudiation, information disclosure, denial of service, elevation of privilege). We don't label each row with its letter; we just made sure every type got asked about. Each row says what could go wrong, what stops it, and whether that's done, tested, or still a wish.
+
 | # | Threat | Example | Control | Status |
 |---|---|---|---|---|
 | T1 | Command injection | Filename `a.mp4; rm -rf ~` | Subprocess with a list of args, never `shell=True`. Ruff `S` rules in CI | done, tested |
@@ -47,7 +49,9 @@
 - Reports contain file paths and color metadata only, never pixels.
 - Test media is synthetic (FFmpeg test sources). Don't commit real footage you don't have rights to, and never commit employer material.
 
-## Running untrusted files safely (recommended)
+## Running untrusted files safely (planned for v0.2)
+
+**The image below doesn't exist yet.** A Dockerfile is on the [roadmap](../ROADMAP.md) for v0.2; this section is the target it has to hit. Until then, the mitigations above are what you have, and the usual advice applies: keep FFmpeg patched, and don't run strangers' files on a machine that matters.
 
 For files from strangers (issue attachments, scraped media), run inside a throwaway container with no network:
 
@@ -63,7 +67,7 @@ Windows PowerShell (Docker Desktop):
 docker run --rm --network none -v "${PWD}\inbox:/data:ro" chromaverity:dev inspect /data/file.mp4
 ```
 
-`--network none` removes the network, `:ro` mounts the folder read-only. `$PWD` / `${PWD}` is the folder you're in; inside the container the files appear at `/data` on every system, because the container is Linux. ⟨should: publish a Dockerfile in v0.2, so this image exists⟩ ⟨assumption: Windows form not tested⟩
+`--network none` removes the network, `:ro` mounts the folder read-only. `$PWD` / `${PWD}` is the folder you're in; inside the container the files appear at `/data` on every system, because the container is Linux. ⟨assumption: Windows form not tested⟩
 
 ## Reporting a vulnerability
 

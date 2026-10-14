@@ -201,9 +201,18 @@ More in [08 Claude Code](08-claude-code.md).
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `'ffmpeg' not found on PATH` | FFmpeg isn't installed, or this terminal started before it was | Install it (section 2), then open a new terminal |
-| `No module named 'chromaverity'` on macOS, with the venv active | The repo is in a folder synced by iCloud Drive (Desktop & Documents sync). iCloud marks files in the venv "hidden", and recent Python versions skip hidden `.pth` files, which is how the editable install finds the code. Check with `ls -lO .venv/lib/python3.*/site-packages/*.pth` (look for `hidden`). Measured on the maintainer's Mac, 2026-10-14: `chflags nohidden` is undone by iCloud within seconds | Keep code out of iCloud: move the repo to a folder like `~/code`, then delete and recreate `.venv`. Same advice for OneDrive on Windows ⟨assumption: not measured⟩ |
+| `No module named 'chromaverity'` on macOS, with the venv active | The repo is in a folder synced by iCloud Drive (see below) | Move the repo to a folder like `~/code`, then delete and recreate `.venv`. Same advice for OneDrive on Windows ⟨assumption: not measured⟩ |
 | Pre-commit hook fails on Windows with `bash\r: No such file or directory` | The hook was checked out with Windows line endings (CRLF). Our `.gitattributes` prevents this on fresh clones | `git rm --cached -r . -q` then `git reset --hard` to re-checkout with LF. This discards uncommitted changes, so commit or stash first |
 | `zsh: no matches found: .[dev,mcp]` | zsh read the brackets as a filename pattern | Keep the quotes: `".[dev,mcp]"` |
 | PowerShell: "running scripts is disabled" | Execution policy | See the note in section 3 |
 | `python` opens the Microsoft Store | Windows app execution alias | Turn it off, or use `py` |
 | FFmpeg tests all skip | FFmpeg found but without libx264 | Install a build with libx264 (Fedora: RPM Fusion) |
+| `ffmpeg timed out after 120s` on a big file | A long 4K file on a slow disk, or a hung parser | Set `CHROMAVERITY_TIMEOUT=600` (seconds) in the environment for that run. If it still hangs, the file may be damaged |
+
+**The iCloud problem in detail.** iCloud's Desktop & Documents sync marks files in the venv "hidden", and recent Python versions skip hidden `.pth` files, which is how an editable install finds the code. Check with `ls -lO .venv/lib/python3.*/site-packages/*.pth` and look for `hidden`. Measured on the maintainer's Mac, 2026-10-14: `chflags nohidden` is undone by iCloud within seconds, so the only fix is to keep code out of synced folders.
+
+## Updating and uninstalling
+
+Update: `git pull`, then with the venv active `pip install -e ".[dev,mcp]"` again (the editable install follows your working copy, so this only matters when dependencies or the entry point change). Rebuild the zoo if `scripts/make_zoo.py` changed: `python scripts/make_zoo.py samples`.
+
+Uninstall: `deactivate`, then delete the `.venv` folder and the repo folder. Nothing was installed anywhere else. If you registered the MCP server with Claude Code, `claude mcp remove chromaverity`.
