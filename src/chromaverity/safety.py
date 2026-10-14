@@ -50,7 +50,8 @@ def require_binary(name: str) -> str:
     if path is None:
         raise ToolError(
             f"'{name}' not found on PATH. Install FFmpeg (macOS: `brew install ffmpeg`, "
-            f"Ubuntu: `sudo apt install ffmpeg`) and try again."
+            f"Ubuntu: `sudo apt install ffmpeg`, Windows: `winget install Gyan.FFmpeg`), open a new "
+            f"terminal and try again. More: docs/install.md"
         )
     return path
 

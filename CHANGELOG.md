@@ -9,6 +9,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 - Mislabel zoo generator is now FFmpeg-version-proof: pixels are made with plain arithmetic (`lutyuv`), labels are written afterwards with `h264_metadata`. FFmpeg 4.4 silently undid `scale=out_range=pc`, which made the old "good full range" clip a real mislabel.
 
 ### Added
+- `docs/install.md`: setup on macOS, Windows (PowerShell, cmd, Git Bash, WSL2) and Linux (Debian/Ubuntu, Fedora, Arch), shell quoting differences, MCP paths per system, troubleshooting. README, CONTRIBUTING and docs 04/08 now show Windows commands alongside macOS/Linux.
 - `chromaverity inspect`: label lint (CT101-CT109), range check against pixels (CT300-CT304), proposed fixes.
 - `chromaverity diff`: label changes across a hop (CT201-CT202).
 - `chromaverity mcp`: read-only MCP server with `chromaverity_inspect` and `chromaverity_diff`, limited to `--root`.

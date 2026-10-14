@@ -6,8 +6,10 @@ Two different things live here: **developing** chromaverity with Claude Code, an
 
 ### First run
 
+These are the macOS / Linux commands. On Windows, see [install.md](install.md) for the PowerShell and cmd versions; only the venv lines differ.
+
 ```bash
-git clone https://github.com/<org>/chromaverity.git    # ⟨fill in once the repo exists⟩
+git clone https://github.com/Novapakt/chromaverity.git
 cd chromaverity
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,mcp]"
@@ -19,7 +21,7 @@ claude                                                # start Claude Code in the
 | Command | Type | Construction |
 |---|---|---|
 | `python3 -m venv .venv` | Python module run as a program (`-m`) | Creates an isolated environment in `.venv/` so this project's packages don't touch your system Python |
-| `source .venv/bin/activate` | shell builtin + script | Runs the activate script *in your current shell* (that's what `source` does), putting `.venv/bin` first on `PATH` |
+| `source .venv/bin/activate` | shell builtin + script | Runs the activate script *in your current shell* (that's what `source` does), putting `.venv/bin` first on `PATH`. Windows PowerShell: `.venv\Scripts\Activate.ps1` (Windows venvs use `Scripts\`, not `bin/`) |
 | `pip install -e ".[dev,mcp]"` | pip, editable install | `-e` links the package to your working copy, so edits take effect without reinstalling. `.[dev,mcp]` means "this folder, plus the `dev` and `mcp` optional extras" from `pyproject.toml`. Quotes stop zsh from treating `[...]` as a filename pattern |
 | `git config core.hooksPath .githooks` | git config, per-repo | Tells git to run hooks from the tracked `.githooks/` folder instead of the untracked `.git/hooks/` |
 
@@ -57,6 +59,8 @@ claude mcp add chromaverity -- chromaverity mcp --root ~/Videos/qc-inbox    # �
 | `chromaverity` | The name the agent will see |
 | `--` | Everything after this is the command to launch, not options for `claude` |
 | `chromaverity mcp --root ...` | Start our server over stdio, limited to that folder |
+
+`chromaverity` has to be on the `PATH` Claude Code sees, which usually means starting `claude` from a terminal where the venv is active. If Claude Code reports "Executable not found in $PATH: chromaverity", give the full path to `.venv/bin/chromaverity` (macOS / Linux) or `.venv\Scripts\chromaverity.exe` (Windows) instead. Examples in [install.md](install.md#7-the-mcp-server-on-each-system).
 
 ### The loop we're designing for
 

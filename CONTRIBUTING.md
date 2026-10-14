@@ -11,13 +11,25 @@ Thanks for looking. chromaverity is part of the Mezzframe AI open lab, and we wr
 | A project | A new pixel check (transfer, matrix), or zoo v0.2 |
 
 ## Setup
-See [docs/08-claude-code.md](docs/08-claude-code.md), Part A. Short version:
+Per-system install steps (macOS, Windows, Linux) are in [docs/install.md](docs/install.md). Working with Claude Code: [docs/08-claude-code.md](docs/08-claude-code.md), Part A. Short version:
+
+macOS / Linux:
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,mcp]"
 git config core.hooksPath .githooks
 pytest && ruff check .
 ```
+
+Windows PowerShell:
+```powershell
+python -m venv .venv; .venv\Scripts\Activate.ps1
+pip install -e ".[dev,mcp]"
+git config core.hooksPath .githooks
+pytest; ruff check .
+```
+
+Windows contributors are especially welcome: CI only covers Linux today, so you'd be the first to find what breaks.
 
 ## Pull requests
 1. One change per PR. Small is good.

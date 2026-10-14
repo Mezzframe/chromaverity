@@ -14,6 +14,8 @@ ffmpeg  [global options]  [input options] -i INPUT  [output options] OUTPUT
 
 Stream specifiers narrow an option to some streams: `-c:v` (video codecs), `-bsf:v` (video bitstream filters), `-map 0:v:0` (input 0, first video stream). `-c copy` with no specifier means "all streams".
 
+Commands below are written for bash/zsh. The `\` at a line end means "continued on the next line". In PowerShell use a backtick `` ` `` instead, in cmd.exe use `^`, or put the command on one line. More shell differences: [install.md](install.md#6-pasting-the-proposed-fixes).
+
 ## 1. Reading the label (probe.py)
 
 ```bash
