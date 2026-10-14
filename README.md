@@ -49,7 +49,7 @@ pip install -e ".[dev,mcp]"
 python scripts/make_zoo.py samples      # build synthetic test clips with known mislabels
 chromaverity inspect samples/full_pixels_labelled_limited.mp4
 chromaverity diff samples/good_limited_709.mp4 samples/hop_dropped_tags.mp4
-pytest                                  # 36 tests
+pytest                                  # 40 tests
 ```
 
 On **Windows** (PowerShell), only the setup lines differ. The `make_zoo`, `chromaverity` and `pytest` lines are the same:

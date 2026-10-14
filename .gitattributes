@@ -1,0 +1,18 @@
+# Line endings, so the repo behaves the same on Windows, macOS and Linux.
+#
+# Git for Windows often converts files to CRLF on checkout (core.autocrlf).
+# That breaks bash scripts: the pre-commit hook would fail with
+# "bash\r: No such file or directory". So: store and check out text as LF
+# everywhere. Every editor we know of handles LF files on Windows today.
+* text=auto eol=lf
+
+# Windows-only script types need CRLF to run reliably in cmd.exe.
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+
+# Media is binary: never touch it (it's .gitignored anyway, belt and braces).
+*.mp4  binary
+*.mov  binary
+*.mkv  binary
+*.mxf  binary
+*.ts   binary

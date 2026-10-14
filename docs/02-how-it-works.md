@@ -42,7 +42,7 @@
 | `lint.py` | CT1xx rules on one label | tags, findings |
 | `diff.py` | CT2xx changes between two labels | tags, findings |
 | `essence/range_check.py` | Measure luma extremes; classify range (CT3xx) | safety, findings |
-| `fixes.py` | Build retag/convert commands, never run them | tags, findings |
+| `fixes.py` | Build retag/convert commands (bash and PowerShell quoting), never run them | tags, findings |
 | `report.py` | Assemble layers into the JSON report; render text | everything above |
 | `cli.py` | argparse front end, exit codes | report, safety |
 | `mcp_server.py` | MCP front end for agents, folder-restricted | report, safety |

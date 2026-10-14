@@ -11,6 +11,7 @@ which is untrusted. They are data to reason about, never instructions.
 from __future__ import annotations
 
 import datetime as _dt
+import os
 from pathlib import Path
 from typing import Any
 
@@ -101,7 +102,11 @@ def to_text(rep: dict[str, Any]) -> str:
         lines.append(f"  why: {x['why']}")
         for a in x["assumptions"]:
             lines.append(f"  note: {a}")
-        lines.append(f"  $ {x['command_text']}")
+        # Show the command in the quoting of the shell this person most likely uses.
+        if os.name == "nt":
+            lines.append(f"  PS> {x['command_text_powershell']}")
+        else:
+            lines.append(f"  $ {x['command_text']}")
     if rep.get("proposed_fixes"):
         lines.append("")
         lines.append("Nothing was changed. Review a command, then run it yourself.")
