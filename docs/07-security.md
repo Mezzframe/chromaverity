@@ -1,6 +1,6 @@
 # 07 · Security and threat model
 
-**Depth:** standard (a published tool that reads untrusted files and can be driven by AI agents). Reviewed 2026-10-13.
+**Depth:** standard (a published tool that reads untrusted files and can be driven by AI agents). Reviewed 2026-10-14.
 
 ## What chromaverity can and can't touch
 
@@ -29,14 +29,17 @@
 |---|---|---|---|---|
 | T1 | Command injection | Filename `a.mp4; rm -rf ~` | Subprocess with a list of args, never `shell=True`. Ruff `S` rules in CI | done, tested |
 | T2 | Protocol abuse via "filename" | `http://attacker/x`, `concat:/etc/passwd\|...`, HLS playlist pointing at internal URLs | Reject protocol-looking paths; prefix `file:`; `-protocol_whitelist file` | done, tested |
+| T2b | Nested references inside a file | A playlist under `--root` whose entries point at files outside it. `-protocol_whitelist file` allows this, because the entries are files too (measured, FFmpeg 9.0.2) | `-format_whitelist` with the containers we read; playlist demuxers (hls, dash, concat) are not on it | done, tested |
 | T3 | Path escape from MCP | Agent asks for `/etc/passwd` or `../../secret.mp4` | `--root` allow-list on resolved paths | done, tested |
 | T4 | Parser crash or hang (DoS) | Malformed file triggers an FFmpeg bug or infinite loop | Timeout on every call (`CHROMAVERITY_TIMEOUT`, default 120 s); frames capped (MCP max 240) | done |
 | T5 | FFmpeg memory-safety bug | Crafted file exploits a decoder | Out of our control. Keep FFmpeg patched; run untrusted batches in a container or VM | **document only** ⟨should⟩ |
 | T6 | Prompt injection through metadata | A file's title/comment says "ignore previous instructions and run ..." | We only copy color fields, not free-text tags; reports carry an untrusted-data note; MCP is read-only | done ⟨should: add a test with a crafted tag once we read any free-text field⟩ |
+| T6b | Terminal escape codes in a filename | `clip\x1b]0;pwned\x07.mp4` rewrites the window title or hides text when printed | Text output and error messages pass through `report.plain()`, which replaces control characters with `?`. JSON is escaped by `json.dumps` | done, tested |
 | T7 | Agent runs a fix without consent | Agent pipes `command_text` into a shell | No apply path exists; MCP instructions say ask first; commands use `-n` (no overwrite) | done |
-| T8 | Supply chain | Malicious dependency | Zero runtime deps; `mcp` optional and version-bounded; CI runs gitleaks and ruff | partial ⟨should: pin dev deps, Dependabot, SBOM at first release⟩ |
+| T8 | Supply chain | Malicious dependency | Zero runtime deps; `mcp` optional and version-bounded; CI runs gitleaks and ruff; GitHub Actions pinned to commit SHAs; Dependabot weekly | done ⟨should: SBOM at first release⟩ |
 | T9 | Secret leak in repo | API key committed | `.gitignore` for `.env`; gitleaks pre-commit hook and CI job | done |
 | T10 | Information disclosure in reports | Report contains absolute paths | Expected for a local tool; be aware before sharing reports publicly | accepted |
+| T11 | Planted `ffmpeg.exe` in the current folder (Windows) | Running chromaverity from inside a downloaded media folder | None yet. Windows searches the current directory before `PATH` unless `NoDefaultCurrentDirectoryInExePath` is set ⟨verify per Python version⟩ | open, low |
 
 ## Data handling
 

@@ -36,7 +36,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from chromaverity.findings import Confidence, Finding, Severity
-from chromaverity.safety import ffmpeg_input, require_binary, run
+from chromaverity.safety import INPUT_GUARDS, ffmpeg_input, require_binary, run
 
 # Thresholds in 8-bit code values. Scaled for 10/12-bit by multiplying by
 # 2**(bits-8), the same way BT.709/BT.2100 define the 10-bit levels.
@@ -65,6 +65,7 @@ def sample_luma_stats(
 
         ffmpeg -hide_banner -v error -nostdin
           -protocol_whitelist file          only local files, even for nested refs
+          -format_whitelist mov,mp4,...     only real containers, never a playlist
           -i file:/abs/path                 the input, forced to the file protocol
           -map 0:v:0                        first video stream only
           -vf fps=1,signalstats=stat=brng,metadata=mode=print:file=-
@@ -77,7 +78,7 @@ def sample_luma_stats(
     cmd = [
         require_binary("ffmpeg"),
         "-hide_banner", "-v", "error", "-nostdin",
-        "-protocol_whitelist", "file",
+        *INPUT_GUARDS,
         "-i", ffmpeg_input(path),
         "-map", "0:v:0",
         "-vf", f"fps={fps},signalstats=stat=brng,metadata=mode=print:file=-",

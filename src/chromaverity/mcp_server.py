@@ -33,13 +33,14 @@ from pathlib import Path
 from typing import Any
 
 from chromaverity import report
+from chromaverity.report import plain
 from chromaverity.safety import ToolError, UnsafeInput, checked_media_path
 
 
 def _refusal(exc: Exception) -> dict[str, Any]:
     # Return the reason as data so the agent can tell the person what happened,
     # instead of a generic tool failure it can only guess about.
-    return {"error": type(exc).__name__, "message": str(exc)}
+    return {"error": type(exc).__name__, "message": plain(str(exc))}
 
 
 def build_server(root: Path) -> Any:

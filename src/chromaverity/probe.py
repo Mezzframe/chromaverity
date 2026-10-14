@@ -22,7 +22,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from chromaverity.safety import ffmpeg_input, require_binary, run
+from chromaverity.safety import INPUT_GUARDS, ffmpeg_input, require_binary, run
 from chromaverity.tags import ColorTags
 
 
@@ -30,7 +30,7 @@ def ffprobe_json(path: Path) -> dict[str, Any]:
     cmd = [
         require_binary("ffprobe"),
         "-v", "error",
-        "-protocol_whitelist", "file",
+        *INPUT_GUARDS,                  # local files only, known containers only (safety.py)
         "-select_streams", "v:0",
         "-show_streams",
         "-show_frames",

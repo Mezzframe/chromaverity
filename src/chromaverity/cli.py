@@ -22,6 +22,7 @@ import sys
 from pathlib import Path
 
 from chromaverity import __version__, report
+from chromaverity.report import plain
 from chromaverity.safety import ToolError, UnsafeInput, checked_media_path
 
 _LEVELS = {"error": 2, "warn": 1, "info": 0, "never": 99}
@@ -91,13 +92,13 @@ def main(argv: list[str] | None = None) -> int:
         else:
             rep = report.diff(checked_media_path(args.before), checked_media_path(args.after))
     except UnsafeInput as exc:
-        print(f"chromaverity: refused input: {exc}", file=sys.stderr)
+        print(f"chromaverity: refused input: {plain(str(exc))}", file=sys.stderr)
         return 4
     except ToolError as exc:
-        print(f"chromaverity: {exc}", file=sys.stderr)
+        print(f"chromaverity: {plain(str(exc))}", file=sys.stderr)
         return 3
     except ValueError as exc:  # e.g. no video stream
-        print(f"chromaverity: {exc}", file=sys.stderr)
+        print(f"chromaverity: {plain(str(exc))}", file=sys.stderr)
         return 3
 
     text = json.dumps(rep, indent=2)
