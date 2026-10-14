@@ -46,7 +46,9 @@ LIMITED_BLACK_BAND = (12, 20)   # where limited-range black really lands after e
 LIMITED_WHITE_BAND = (228, 240)  # where limited-range white really lands after encoding
 
 DEFAULT_SAMPLE_FRAMES = 24
-DEFAULT_SAMPLE_FPS = 1.0
+# Never ask the fps filter for more than this: above it we'd mostly be
+# duplicating frames of a very short clip for no extra information.
+MAX_SAMPLE_FPS = 30.0
 
 
 @dataclass
@@ -54,12 +56,25 @@ class FrameStats:
     ymin: int
     ymax: int
     brng: float  # as reported by signalstats ⟨verify units: appears to be percent⟩
+    sample_fps: float | None = None  # how the frame was picked; recorded in the evidence
+
+
+def sample_fps(frames: int, duration: float | None) -> float:
+    """Frames per second to ask for, so `frames` samples cover the whole clip.
+
+    A 10-minute programme with 24 frames gives one every 25 s. A 2-second
+    clip gives 12 per second. Without a duration we fall back to one per
+    second, which only covers the first `frames` seconds (the pre-0.1 behaviour).
+    """
+    if not duration or duration <= 0:
+        return 1.0
+    return round(min(max(frames / duration, 0.001), MAX_SAMPLE_FPS), 4)
 
 
 def sample_luma_stats(
-    path: Path, frames: int = DEFAULT_SAMPLE_FRAMES, fps: float = DEFAULT_SAMPLE_FPS
+    path: Path, frames: int = DEFAULT_SAMPLE_FRAMES, duration: float | None = None
 ) -> list[FrameStats]:
-    """Run signalstats over a spread of frames and parse the results.
+    """Run signalstats over frames spread across the clip and parse the results.
 
     The command, piece by piece:
 
@@ -68,13 +83,15 @@ def sample_luma_stats(
           -format_whitelist mov,mp4,...     only real containers, never a playlist
           -i file:/abs/path                 the input, forced to the file protocol
           -map 0:v:0                        first video stream only
-          -vf fps=1,signalstats=stat=brng,metadata=mode=print:file=-
-              fps=1          one frame per second, so we sample the whole clip
+          -vf fps=0.04,signalstats=stat=brng,metadata=mode=print:file=-
+              fps=N          N = frames / duration, so the samples span the clip
+                             (a leader of bars or black can't dominate the verdict)
               signalstats    measure YMIN/YMAX; stat=brng adds the out-of-range %
               metadata=print write those numbers to stdout ("file=-")
           -frames:v 24                      stop after 24 sampled frames
           -f null -                         decode only, write no output file
     """
+    fps = sample_fps(frames, duration)
     cmd = [
         require_binary("ffmpeg"),
         "-hide_banner", "-v", "error", "-nostdin",
@@ -86,7 +103,10 @@ def sample_luma_stats(
         "-f", "null", "-",
     ]
     proc = run(cmd)
-    return parse_metadata_print(proc.stdout)
+    stats = parse_metadata_print(proc.stdout)
+    for st in stats:
+        st.sample_fps = fps
+    return stats
 
 
 def parse_metadata_print(text: str) -> list[FrameStats]:
@@ -148,6 +168,7 @@ def classify_range(stats: list[FrameStats], tagged_range: str | None, bit_depth:
 
     evidence = {
         "frames_sampled": n,
+        "sample_fps": stats[0].sample_fps,
         "bit_depth": bits,
         "luma_min": ymin,
         "luma_max": ymax,
@@ -164,6 +185,7 @@ def classify_range(stats: list[FrameStats], tagged_range: str | None, bit_depth:
     }
 
     looks_full = deep_black > 0 or hot_white > 0
+    evidence["looks_full"] = looks_full
     full_conf = (
         Confidence.HIGH if deep_black and hot_white and reserved_hit
         else Confidence.MEDIUM if deep_black and hot_white

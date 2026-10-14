@@ -34,11 +34,29 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 # Generous for a 4K file on a laptop, short enough that a hung parser can't
 # stall an agent forever. Override with CHROMAVERITY_TIMEOUT (seconds).
-DEFAULT_TIMEOUT = float(os.environ.get("CHROMAVERITY_TIMEOUT", "120"))
+_FALLBACK_TIMEOUT = 120.0
+
+
+def _timeout_from_env() -> float:
+    raw = os.environ.get("CHROMAVERITY_TIMEOUT")
+    if raw is None:
+        return _FALLBACK_TIMEOUT
+    try:
+        value = float(raw)
+    except ValueError:
+        value = float("nan")
+    if not value > 0:  # also catches nan
+        sys.stderr.write(f"chromaverity: ignoring CHROMAVERITY_TIMEOUT={raw!r}; using {_FALLBACK_TIMEOUT:.0f}s\n")
+        return _FALLBACK_TIMEOUT
+    return value
+
+
+DEFAULT_TIMEOUT = _timeout_from_env()
 
 # Container formats we read. Anything else is refused by FFmpeg before it
 # parses a byte. Playlist "formats" (hls, dash, concat) are deliberately

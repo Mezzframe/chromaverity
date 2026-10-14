@@ -58,7 +58,7 @@ chromaverity inspect clip.mp4
   3. probe.py      ffprobe -show_streams -show_frames (first frame only)
   4. tags.py       ColorTags(primaries, transfer, matrix, range, ...)
   5. lint.py       CT1xx findings
-  6. range_check   ffmpeg fps=1,signalstats  ──► 24 × (YMIN, YMAX, BRNG)
+  6. range_check   ffmpeg fps=N,signalstats  ──► 24 × (YMIN, YMAX, BRNG), spread over the clip
                    classify_range(stats, tagged_range, bit_depth) ──► one CT3xx finding
   7. fixes.py      commands for any fixable finding
   8. report.py     JSON report ──► cli prints text (or --json)

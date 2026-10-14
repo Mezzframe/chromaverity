@@ -22,7 +22,7 @@ from chromaverity.essence.range_check import DEFAULT_SAMPLE_FRAMES, classify_ran
 from chromaverity.findings import Finding, worst
 from chromaverity.fixes import propose
 from chromaverity.lint import lint
-from chromaverity.probe import read_tags
+from chromaverity.probe import read_tags, read_tags_and_duration
 from chromaverity.safety import ToolError, checked_media_path, require_binary, run
 from chromaverity.tags import ColorTags, friendly
 
@@ -74,10 +74,10 @@ def inspect(path: Path, frames: int = DEFAULT_SAMPLE_FRAMES, essence: bool = Tru
     # The CLI and MCP server already gate their inputs; doing it here too means a
     # library caller gets the same refusals, and the gate is idempotent.
     path = checked_media_path(path)
-    tags = read_tags(path)
+    tags, duration = read_tags_and_duration(path)
     findings: list[Finding] = lint(tags)
     if essence:
-        stats = sample_luma_stats(path, frames=frames)
+        stats = sample_luma_stats(path, frames=frames, duration=duration)
         findings.append(classify_range(stats, tags.color_range, tags.bit_depth))
     fixes = propose(path, tags, findings)
     rep = _envelope("inspect")

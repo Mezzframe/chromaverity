@@ -39,6 +39,7 @@ from pathlib import Path
 from typing import Any
 
 from chromaverity.findings import Finding
+from chromaverity.lint import HDR_TRANSFERS
 from chromaverity.tags import ColorTags
 
 # Bitstream filters that can rewrite the VUI color flags without re-encoding.
@@ -48,7 +49,11 @@ RETAG_BSF = {"h264": "h264_metadata", "hevc": "hevc_metadata"}
 
 # H.273 code points for the values we propose. These are the numbers that
 # actually sit in the bitstream; ffprobe shows them as names.
-H273 = {"bt709": 1, "unspecified": 2}
+H273 = {"bt709": 1}
+
+# Values that say "this is not plain HD SDR". If any set field is one of
+# these, filling the blanks with BT.709 would be wrong, so we don't offer it.
+_NOT_SDR_709 = {"bt2020", "bt2020nc", "bt2020c", *HDR_TRANSFERS}
 
 
 # Characters PowerShell reads as plain text in a bare argument. Anything else
@@ -136,17 +141,18 @@ def propose(src: Path, tags: ColorTags, findings: list[Finding]) -> list[Propose
     )
 
     if "CT301" in ids or ("CT303" in ids and _looks_full(findings)):
+        for_id = "CT301" if "CT301" in ids else "CT303"
         cmd = _retag(src, tags, "video_full_range_flag=1", ["-color_range", "pc"], "fullrange")
         if cmd:
             fixes.append(ProposedFix(
-                for_finding="CT301" if "CT301" in ids else "CT303",
+                for_finding=for_id,
                 kind="retag", reencode=False,
                 title="Label the file as full range (pixels unchanged)",
                 why="Use this if the pixels are correct and only the flag is wrong.",
                 command=cmd,
             ))
         fixes.append(ProposedFix(
-            for_finding="CT301" if "CT301" in ids else "CT303",
+            for_finding=for_id,
             kind="convert", reencode=True,
             title="Convert the pixels to limited range (label unchanged)",
             why="Use this if the delivery spec requires limited range. Costs one encode generation.",
@@ -164,17 +170,38 @@ def propose(src: Path, tags: ColorTags, findings: list[Finding]) -> list[Propose
             fixes[-1].assumptions.append(no_bsf_note)
 
     if "CT302" in ids or ("CT303" in ids and not _looks_full(findings)):
+        for_id = "CT302" if "CT302" in ids else "CT303"
         cmd = _retag(src, tags, "video_full_range_flag=0", ["-color_range", "tv"], "limitedrange")
         if cmd:
             fixes.append(ProposedFix(
-                for_finding="CT302" if "CT302" in ids else "CT303",
+                for_finding=for_id,
                 kind="retag", reencode=False,
                 title="Label the file as limited range (pixels unchanged)",
                 why="The pixels already sit at limited-range levels; only the flag needs to change.",
                 command=cmd,
             ))
+        else:
+            fixes.append(ProposedFix(
+                for_finding=for_id, kind="convert", reencode=True,
+                title="Re-encode with the limited-range label set",
+                why="This codec has no lossless retag path in v0.1, so the label can only be set while encoding.",
+                command=[
+                    "ffmpeg", "-n", "-i", str(src),
+                    "-map", "0", "-c", "copy",
+                    "-c:v", "libx264", "-crf", "16", "-preset", "slow",
+                    "-color_range", "tv",
+                    str(_out_path(src, "limitedrange")),
+                ],
+                assumptions=[
+                    no_bsf_note,
+                    "libx264 output; swap the encoder and quality settings for your delivery spec",
+                ],
+            ))
 
-    if "CT101" in ids and (tags.height or 0) >= 720 and tags.color_transfer not in ("smpte2084", "arib-std-b67"):
+    set_values = {tags.color_primaries, tags.color_transfer, tags.color_space} - {None}
+    if "CT101" in ids and (tags.height or 0) >= 720 and not (set_values & _NOT_SDR_709):
+        # Only when nothing already set points at BT.2020 or HDR. Otherwise we'd
+        # write a 709 matrix under 2020 primaries, or SDR flags onto HDR.
         blank = set(tags.blank_fields())
         parts, container = [], []
         if "color_primaries" in blank:
@@ -200,4 +227,5 @@ def propose(src: Path, tags: ColorTags, findings: list[Finding]) -> list[Propose
 
 
 def _looks_full(findings: list[Finding]) -> bool:
-    return any(f.id == "CT303" and "full" in f.title for f in findings)
+    # Read the evidence, not the prose: docs/05 tells agents the same thing.
+    return any(f.id == "CT303" and f.evidence.get("looks_full") for f in findings)
