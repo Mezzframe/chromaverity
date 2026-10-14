@@ -19,6 +19,8 @@ Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order
 - [ ] Full luma histogram + chroma evidence for range
 - [ ] Retag via `av1_metadata` ⟨verify options⟩
 - [ ] Pin dev deps, Dependabot, SBOM on release
+- [ ] CI on macOS and Windows too, so [install.md](docs/install.md) can say "tested" for all three
+- [ ] Print proposed fixes quoted for the user's shell (PowerShell/cmd on Windows), not only bash
 
 ## v0.3 · "transfer and matrix"
 - [ ] CT31x transfer: PQ/HLG vs SDR from code-value distribution

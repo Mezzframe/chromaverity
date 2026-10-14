@@ -4,7 +4,9 @@
 #
 # Fails closed: if gitleaks isn't installed, the commit is blocked with a
 # message, so a missing tool can't silently turn the check off.
-# Install: brew install gitleaks  (macOS)  ·  see github.com/gitleaks/gitleaks (Linux)
+# Install: brew install gitleaks (macOS) · winget install Gitleaks.Gitleaks (Windows)
+#          · release binary from github.com/gitleaks/gitleaks (Linux)
+# On Windows, Git for Windows runs this with its bundled bash.
 set -euo pipefail
 
 if ! command -v gitleaks >/dev/null 2>&1; then

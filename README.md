@@ -32,10 +32,18 @@ Every tool reads the label. Open tools don't check whether the label matches the
 
 ## Quick start
 
-Needs Python 3.10+ and FFmpeg (`brew install ffmpeg` / `sudo apt install ffmpeg`).
+Needs Python 3.10+ and FFmpeg.
+
+| | Install the tools |
+|---|---|
+| macOS | `brew install python ffmpeg git` |
+| Debian / Ubuntu | `sudo apt install python3 python3-venv git ffmpeg` |
+| Windows (PowerShell) | `winget install Python.Python.3.13; winget install Gyan.FFmpeg; winget install Git.Git`, then open a new terminal |
+
+Then, on **macOS / Linux**:
 
 ```bash
-git clone https://github.com/<org>/chromaverity.git && cd chromaverity   # ⟨fill in org⟩
+git clone https://github.com/Novapakt/chromaverity.git && cd chromaverity
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,mcp]"
 python scripts/make_zoo.py samples      # build synthetic test clips with known mislabels
@@ -43,6 +51,16 @@ chromaverity inspect samples/full_pixels_labelled_limited.mp4
 chromaverity diff samples/good_limited_709.mp4 samples/hop_dropped_tags.mp4
 pytest                                  # 36 tests
 ```
+
+On **Windows** (PowerShell), only the setup lines differ. The `make_zoo`, `chromaverity` and `pytest` lines are the same:
+
+```powershell
+git clone https://github.com/Novapakt/chromaverity.git; cd chromaverity
+python -m venv .venv; .venv\Scripts\Activate.ps1
+pip install -e ".[dev,mcp]"
+```
+
+Linux is tested in CI. macOS and Windows aren't yet. Full per-system guide, other Linux distros, WSL, cmd.exe and troubleshooting: [docs/install.md](docs/install.md).
 
 ## What it checks (v0.1)
 
