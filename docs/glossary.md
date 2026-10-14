@@ -52,6 +52,6 @@
 | **VUI** | Video Usability Information: the part of an H.264/HEVC header that carries the color flags |
 | **Work order (WO)** | A numbered task list for one piece of maintenance, written for Claude Code to carry out and Mark to review commit by commit. Kept in `docs/work-orders/` |
 | **Y'CbCr** | The way video stores color: one brightness channel (Y') and two color-difference channels (Cb, Cr), instead of R, G and B. The prime marks mean "after the transfer curve" |
-| **Markers** | ⟨assumption⟩ believed, not measured · ⟨verify⟩ changes over time, check before relying on it · ⟨should⟩ a known gap we intend to close · ⟨PRO⟩ needs a professional (lawyer, accountant) before it can be settled |
+| **Markers** | ⟨assumption⟩ believed, not measured · ⟨verify⟩ changes over time, check before relying on it · ⟨should⟩ a known gap we intend to close |
 
 Spelling: "color" everywhere, matching the FFmpeg and H.273 names it mirrors (`color_range`, `-colorspace`), and "labelled" throughout.
