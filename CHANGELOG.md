@@ -11,10 +11,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 - `test_safety`: shell-characters test no longer assumes POSIX paths.
 
 ### Changed
+- GitHub Actions in CI are pinned to commit SHAs, with the version in a comment (checkout v6.1.0, setup-python v6.3.0, gitleaks-action v3.0.0).
+- Project URLs filled in: `pyproject.toml` (Repository, Issues, Changelog) and `CITATION.cff` (`repository-code`).
 - Renamed from the working name `colortruth` to `chromaverity` before first release (colortruth.com is registered and X-Rite's ColorTRUE is a color-calibration app; too close). Finding IDs keep the `CT` prefix, read as "color tag".
 - Mislabel zoo generator is now FFmpeg-version-proof: pixels are made with plain arithmetic (`lutyuv`), labels are written afterwards with `h264_metadata`. FFmpeg 4.4 silently undid `scale=out_range=pc`, which made the old "good full range" clip a real mislabel.
 
 ### Added
+- `ffmpeg.version` in every report (null if FFmpeg can't be read), also shown in the text header. New report field, no schema bump.
+- Dependabot for GitHub Actions and pip, checked weekly.
 - Every proposed fix now has `command_text_powershell` next to `command_text` (bash). The text output shows the PowerShell form on Windows (`PS> ...`). New report field, no schema bump. Quoting is tested by round-tripping awkward filenames through real PowerShell.
 - `.gitattributes` (LF line endings everywhere, so the bash pre-commit hook works on Windows) and `.editorconfig`.
 - CI on Windows also follows docs/install.md in PowerShell and cmd.exe, not only Git Bash.
