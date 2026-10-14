@@ -21,7 +21,7 @@ $ chromaverity inspect clip.mp4
        and clipped highlights.
 
 Proposed (retag, no re-encode): Label the file as full range (pixels unchanged)
-  $ ffmpeg -n -i clip.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 clip.fullrange.mp4
+  $ ffmpeg -n -i clip.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 -color_range pc clip.fullrange.mp4
 
 Nothing was changed. Review a command, then run it yourself.
 ```

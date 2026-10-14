@@ -74,11 +74,13 @@
         "copy",
         "-bsf:v",
         "h264_metadata=video_full_range_flag=1",
+        "-color_range",
+        "pc",
         "zoo/full_pixels_labelled_limited.fullrange.mp4"
       ],
       "reencode": false,
       "assumptions": [],
-      "command_text": "ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 zoo/full_pixels_labelled_limited.fullrange.mp4"
+      "command_text": "ffmpeg -n -i zoo/full_pixels_labelled_limited.mp4 -map 0 -c copy -bsf:v h264_metadata=video_full_range_flag=1 -color_range pc zoo/full_pixels_labelled_limited.fullrange.mp4"
     },
     {
       "for_finding": "CT301",
