@@ -4,7 +4,7 @@
 
 chromaverity checks whether a video's color label (primaries, transfer, matrix, range) matches what's actually in the picture. It reads the label, checks it across processing hops, measures the pixels, and tells you where they disagree, how sure it is, and the FFmpeg command that would fix it. It runs from the command line, in CI, or as an MCP tool that AI agents can call to check their own transcodes.
 
-An open tool from the [Mezzframe AI](https://mezzframe.ai) lab · Encode topic · v0.1 (pre-alpha)
+An open tool from the [Mezzframe](https://mezzframe.ai) lab · Encode topic · v0.1 (pre-alpha)
 
 ```
 $ chromaverity inspect clip.mp4

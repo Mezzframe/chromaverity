@@ -3,7 +3,7 @@ message: "If you use chromaverity in research or a publication, please cite it a
 title: "chromaverity: checking video color labels against pixels"
 type: software
 authors:
-  - name: "Mezzframe AI open lab"   # ⟨PRO: confirm the legal author/copyright holder⟩
+  - name: "Mezzframe open lab"   # ⟨PRO: confirm the legal author/copyright holder⟩
 license: Apache-2.0
 version: 0.1.0.dev0
 url: "https://mezzframe.ai"

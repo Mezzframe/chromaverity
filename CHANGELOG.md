@@ -11,6 +11,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 - `test_safety`: shell-characters test no longer assumes POSIX paths.
 
 ### Changed
+- The organization is now called "Mezzframe" everywhere (was "Mezzframe AI"): README, CONTRIBUTING, CLAUDE.md, package metadata, NOTICE, CITATION.cff, LICENSE-docs credit line. The domain stays mezzframe.ai.
 - GitHub Actions in CI are pinned to commit SHAs, with the version in a comment (checkout v6.1.0, setup-python v6.3.0, gitleaks-action v3.0.0).
 - Project URLs filled in: `pyproject.toml` (Repository, Issues, Changelog) and `CITATION.cff` (`repository-code`).
 - Renamed from the working name `colortruth` to `chromaverity` before first release (colortruth.com is registered and X-Rite's ColorTRUE is a color-calibration app; too close). Finding IDs keep the `CT` prefix, read as "color tag".

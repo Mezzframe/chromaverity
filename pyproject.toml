@@ -10,7 +10,7 @@ readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.10"
-authors = [{ name = "Mezzframe AI" }]
+authors = [{ name = "Mezzframe" }]
 keywords = ["video", "ffmpeg", "color", "broadcast", "qc", "hdr", "mcp"]
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",

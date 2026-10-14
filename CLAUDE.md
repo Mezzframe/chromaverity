@@ -3,7 +3,7 @@
 Context for Claude Code (and any human reading over its shoulder).
 
 ## What this is
-chromaverity checks whether a video's color label matches its pixels. Mezzframe AI open lab, Encode topic, Apache-2.0 code, CC BY 4.0 docs. Maintainer: Mark (broadcast systems engineer, beginner-to-intermediate Python). One-person lab today; written for contributors tomorrow.
+chromaverity checks whether a video's color label matches its pixels. Mezzframe open lab, Encode topic, Apache-2.0 code, CC BY 4.0 docs. Maintainer: Mark (broadcast systems engineer, beginner-to-intermediate Python). One-person lab today; written for contributors tomorrow.
 
 ## How to work here
 - **Teach through the work.** Comment the *why*. When you show a CLI command, explain each part (program, subcommand, flags, how they're built). Point out skill gaps and say what's worth learning vs outsourcing.
