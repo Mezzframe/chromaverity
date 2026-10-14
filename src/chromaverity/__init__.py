@@ -1,6 +1,6 @@
 """chromaverity: check whether a video's color labels match its pixels.
 
-Mezzframe AI open lab, Encode topic. Apache-2.0.
+Mezzframe open lab, Encode topic. Apache-2.0.
 
 The package is split so that each module does one job you can explain in a
 sentence. See docs/02-how-it-works.md for the map.

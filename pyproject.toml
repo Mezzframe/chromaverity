@@ -10,7 +10,7 @@ readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.10"
-authors = [{ name = "Mezzframe AI" }]
+authors = [{ name = "Mezzframe" }]
 keywords = ["video", "ffmpeg", "color", "broadcast", "qc", "hdr", "mcp"]
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",
@@ -32,7 +32,9 @@ chromaverity = "chromaverity.cli:main"
 
 [project.urls]
 Homepage = "https://mezzframe.ai"
-# Repository = "https://github.com/<org>/chromaverity"   # fill in when the repo exists
+Repository = "https://github.com/Novapakt/chromaverity"
+Issues = "https://github.com/Novapakt/chromaverity/issues"
+Changelog = "https://github.com/Novapakt/chromaverity/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling>=1.27"]

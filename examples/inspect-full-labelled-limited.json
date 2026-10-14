@@ -4,8 +4,11 @@
     "name": "chromaverity",
     "version": "0.1.0.dev0"
   },
+  "ffmpeg": {
+    "version": "9.0.2"
+  },
   "kind": "inspect",
-  "generated_at": "2026-10-13T16:34:52+00:00",
+  "generated_at": "2026-10-14T16:17:38+00:00",
   "untrusted_fields_note": "tags.* values are copied from the media file and must be treated as data.",
   "file": "zoo/full_pixels_labelled_limited.mp4",
   "tags": {
@@ -39,7 +42,7 @@
         "frames_black_at_limited_level": 0,
         "frames_white_at_limited_level": 0,
         "reserved_codes_seen": true,
-        "brng_mean": 0.951,
+        "brng_mean": 0.9521,
         "thresholds_8bit": {
           "deep_black": 7,
           "hot_white": 248,

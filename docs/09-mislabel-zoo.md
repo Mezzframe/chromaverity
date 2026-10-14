@@ -24,7 +24,7 @@ Because the lie is ours, the ground truth is exact, and we can make as many case
 | hd_labelled_601 | 709 | 601 matrix | CT102 |
 | hop_dropped_tags | copy of good_limited_709 | primaries/transfer/matrix blanked | CT201 |
 
-Three lessons found while building it, both exactly the kind of silent behavior this tool exists to catch:
+Three lessons found while building it, all exactly the kind of silent behavior this tool exists to catch:
 
 1. **FFmpeg versions disagree about range.** Our first generator used `scale=out_range=pc` to make full-range pixels. On FFmpeg 6.1 that worked. On FFmpeg 4.4 the next filter (`format=yuv420p`) quietly converted the pixels back to limited, so the "good full range" clip was really limited pixels labelled full, and chromaverity flagged it (CT302). The detector was right and our fixture was wrong. The fix: make every clip limited first (all versions agree on that), stretch to full with plain arithmetic (`lutyuv`), and write the label separately with `h264_metadata`. Pixels and label are now set by two independent steps.
 2. **Modern FFmpeg copies range from each frame into the encoder**, so leaving out `-color_range` can still produce a labelled file. We wipe frame tags with `setparams` before encoding so the only label is the one we write on purpose.

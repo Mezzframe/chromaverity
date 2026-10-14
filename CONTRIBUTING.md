@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for looking. chromaverity is part of the Mezzframe AI open lab, and we write everything with a stranger in mind, so you're exactly who this is for.
+Thanks for looking. chromaverity is part of the Mezzframe open lab, and we write everything with a stranger in mind, so you're exactly who this is for.
 
 ## Ways to help
 | Effort | Idea |

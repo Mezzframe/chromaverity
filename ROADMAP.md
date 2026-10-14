@@ -8,11 +8,13 @@ Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order
 - [x] Proposed retag/convert commands (H.264, HEVC), never applied
 - [x] MCP server, read-only, folder-restricted
 - [x] Synthetic mislabel zoo v0.1 + 36 tests
-- [ ] CI green on GitHub from a clean clone
+- [x] CI green on GitHub from a clean clone
 - [ ] Tag `v0.1.0`, publish to PyPI ⟨verify name still free⟩
 
 ## v0.2 · "zoo goes real"
-- [ ] Record FFmpeg version and command lines in every report (reproducibility)
+- [x] FFmpeg version in every report (reproducibility)
+- [ ] Command lines in every report
+- [ ] Drop Python 3.10 (EOL 2026-10-01, PEP 619); raise requires-python to >=3.11 and move the 22.04 CI job to 3.11
 - [ ] Dockerfile for running untrusted files with `--network none`
 - [ ] Zoo v0.2: public-domain footage, full matrix of mislabels, realistic hops
 - [ ] Publish range-check accuracy, false-alarm and inconclusive rates
@@ -33,7 +35,7 @@ Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order
 - Scene-aware frame sampling
 - Batch mode and an HTML report for archives
 - Chroma siting check (CT33x)
-- GitHub Action wrapper: `uses: <org>/chromaverity-action`
+- GitHub Action wrapper: `uses: Novapakt/chromaverity-action`
 
 ## Content angles
 - "Your file says BT.709. The pixels disagree." (short video, the same frame decoded both ways)
