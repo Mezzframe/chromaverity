@@ -37,7 +37,7 @@ These docs are written so that anyone on the project can explain what chromaveri
 
 - ⟨assumption⟩ marks something we believe but haven't measured.
 - ⟨verify⟩ marks a fact that changes over time (versions, flags, defaults). Check it before relying on it.
-- ⟨should⟩ marks a known gap we intend to close; ⟨PRO⟩ marks a question for a professional (lawyer, accountant) before it can be settled.
+- ⟨should⟩ marks a known gap we intend to close.
 - Code values are 8-bit unless stated. Multiply by 4 for 10-bit, 16 for 12-bit.
 - "Label" and "tags" mean the color metadata. "Essence" and "pixels" mean the picture itself. These are broadcast terms on purpose: metadata vs. essence is the distinction this whole tool is about.
 
