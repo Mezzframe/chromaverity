@@ -53,7 +53,35 @@ Needs Python 3.10+ and FFmpeg.
 | Debian / Ubuntu | `sudo apt install python3 python3-venv git ffmpeg` |
 | Windows (PowerShell) | `winget install Python.Python.3.13; winget install Gyan.FFmpeg; winget install Git.Git`, then open a new terminal |
 
-Then, on **macOS / Linux**:
+(Git is only needed for the from-source steps further down.)
+
+### Just want to use it?
+
+chromaverity is on PyPI. pip installs the Python side; FFmpeg has to come from the table above, since pip can't install it. We suggest a virtual environment so it stays out of your system Python.
+
+On **macOS / Linux**:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install chromaverity
+chromaverity inspect your-clip.mp4
+```
+
+On **Windows** (PowerShell):
+
+```powershell
+python -m venv .venv; .venv\Scripts\Activate.ps1
+pip install chromaverity
+chromaverity inspect your-clip.mp4
+```
+
+PowerShell says "running scripts is disabled"? See the execution-policy note in [docs/install.md](docs/install.md#3-get-the-code-and-set-up).
+
+For the MCP server, install the extra instead: `pip install "chromaverity[mcp]"` (the quotes stop the shell from reading the brackets).
+
+### From source (to run the tests or contribute)
+
+On **macOS / Linux**:
 
 ```bash
 git clone https://github.com/Novapakt/chromaverity.git && cd chromaverity
