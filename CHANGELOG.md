@@ -4,6 +4,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Docs
+- README quick start shows `pip install chromaverity` (plus FFmpeg) before the from-source steps.
+- Release guide: wait for CI on `main` to finish green before `gh release create`, and a troubleshooting entry for PyPI's `invalid-publisher` error.
+
 ## [0.1.0] - 2026-10-14
 
 First release. Everything below is new in 0.1.0; the Security, Fixed, Changed and Removed sections describe changes made during the pre-release hardening (WO-001, WO-002), kept so the history of each decision is readable.
