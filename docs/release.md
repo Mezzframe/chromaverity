@@ -27,11 +27,11 @@ We publish with PyPI's **Trusted Publishing**. No password or API token lives an
 4. Wait for CI on `main` to finish green before going on. Merging starts a fresh run on `main`, and the release tags whatever `main` is at that moment, so a red run here means we'd publish a commit that failed. The upload can't be undone (see below).
 
    ```bash
-   gh run list --branch main --limit 1
-   gh run watch --exit-status
+   gh run list --branch main --workflow ci --limit 1
+   gh run watch <run-id> --exit-status
    ```
 
-   `gh run list` shows runs; `--branch main` keeps only runs on `main` and `--limit 1` shows just the newest. `gh run watch` asks which run to follow, then updates live until it ends; `--exit-status` makes it exit non-zero if the run fails, so you can't miss a red result.
+   `gh run list` shows runs; `--branch main` keeps only runs on `main`, `--workflow ci` keeps only the test workflow (the `name: ci` at the top of `.github/workflows/ci.yml`, so other workflows such as Dependabot's don't show up), and `--limit 1` shows just the newest. Its ID column is the `<run-id>`. `gh run watch <run-id>` follows that run live until it ends; `--exit-status` makes it exit non-zero if the run fails, so you can't miss a red result.
 
 5. Create the release from `main`:
 

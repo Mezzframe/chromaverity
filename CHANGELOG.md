@@ -4,7 +4,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
-### Docs
+### Changed
 - README quick start shows `pip install chromaverity` (plus FFmpeg) before the from-source steps.
 - Release guide: wait for CI on `main` to finish green before `gh release create`, and a troubleshooting entry for PyPI's `invalid-publisher` error.
 

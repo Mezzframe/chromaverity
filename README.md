@@ -75,6 +75,8 @@ pip install chromaverity
 chromaverity inspect your-clip.mp4
 ```
 
+PowerShell says "running scripts is disabled"? See the execution-policy note in [docs/install.md](docs/install.md#3-get-the-code-and-set-up).
+
 For the MCP server, install the extra instead: `pip install "chromaverity[mcp]"` (the quotes stop the shell from reading the brackets).
 
 ### From source (to run the tests or contribute)
