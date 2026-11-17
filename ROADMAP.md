@@ -1,6 +1,6 @@
 # Roadmap
 
-Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order can change; the backlog lives in [GitHub issues](https://github.com/Novapakt/chromaverity/issues).
+Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order can change; the backlog lives in [GitHub issues](https://github.com/Mezzframe/chromaverity/issues).
 
 ## v0.1 · "range truth" (this release)
 - [x] Label lint (CT1xx), hop diff (CT2xx)
@@ -38,7 +38,7 @@ Sized for a few hours a week. Two-week sprints (Mezzframe DELIVERY spine). Order
 - Scene-aware frame sampling (today: evenly spread, `frames / duration` per second)
 - Batch mode and an HTML report for archives
 - Chroma siting check (CT33x)
-- GitHub Action wrapper: `uses: Novapakt/chromaverity-action`
+- GitHub Action wrapper: `uses: Mezzframe/chromaverity-action`
 
 ## Content angles
 - "Your file says BT.709. The pixels disagree." (short video, the same frame decoded both ways)

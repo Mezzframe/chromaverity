@@ -10,6 +10,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Changed
 - README quick start shows `pip install chromaverity` (plus FFmpeg) before the from-source steps.
 - README no longer says the repo is published from the maintainer's personal account; it lives in the Mezzframe org.
+- All repo links (README, docs, `pyproject.toml`, `CITATION.cff`, issue template) point at `github.com/Mezzframe/chromaverity`. The release guide covers moving the PyPI trusted publisher to the new owner.
 - Release guide: wait for CI on `main` to finish green before `gh release create`, and a troubleshooting entry for PyPI's `invalid-publisher` error.
 
 ## [0.1.0] - 2026-10-14
@@ -73,5 +74,5 @@ First release. Everything below is new in 0.1.0; the Security, Fixed, Changed an
 - `scripts/make_zoo.py`: synthetic mislabel zoo v0.1 (7 clips).
 - Educational docs (00-10, glossary, 4 ADRs), CI, gitleaks pre-commit hook.
 
-[Unreleased]: https://github.com/Novapakt/chromaverity/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/Novapakt/chromaverity/releases/tag/v0.1.0
+[Unreleased]: https://github.com/Mezzframe/chromaverity/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Mezzframe/chromaverity/releases/tag/v0.1.0

@@ -3,7 +3,7 @@
 # No password or API token is stored anywhere. PyPI "Trusted Publishing" checks a
 # short-lived identity token that GitHub issues to *this* workflow in *this* repo,
 # and only accepts an upload if pypi.org has been told to expect exactly that
-# (owner Novapakt, repo chromaverity, workflow release.yml, environment pypi).
+# (owner Mezzframe, repo chromaverity, workflow release.yml, environment pypi).
 # Setup, once, by the maintainer: docs/release.md.
 name: release
 
