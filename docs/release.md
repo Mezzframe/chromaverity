@@ -4,7 +4,7 @@ How a version goes from `main` to GitHub and PyPI. Written for the maintainer; u
 
 ## One-time setup: tell PyPI to trust our release workflow
 
-We publish with PyPI's **Trusted Publishing**. No password or API token lives anywhere: when the release workflow runs, GitHub gives it a short-lived identity token, and PyPI accepts the upload only if that token says "Novapakt/chromaverity, workflow release.yml, environment pypi". You tell PyPI to expect that once.
+We publish with PyPI's **Trusted Publishing**. No password or API token lives anywhere: when the release workflow runs, GitHub gives it a short-lived identity token, and PyPI accepts the upload only if that token says "Mezzframe/chromaverity, workflow release.yml, environment pypi". You tell PyPI to expect that once.
 
 1. Sign in at [pypi.org](https://pypi.org) (create an account if needed, and turn on two-factor auth: PyPI requires it to publish).
 2. Go to **Your account → Publishing** and add a **pending publisher** (the project doesn't exist on PyPI until the first upload, so it's "pending"):
@@ -12,12 +12,23 @@ We publish with PyPI's **Trusted Publishing**. No password or API token lives an
    | Field | Value |
    |---|---|
    | PyPI project name | `chromaverity` |
-   | Owner | `Novapakt` |
+   | Owner | `Mezzframe` |
    | Repository name | `chromaverity` |
    | Workflow name | `release.yml` |
    | Environment name | `pypi` |
 
 3. On GitHub, **Settings → Environments → New environment**, name it `pypi`. Optionally add yourself as a required reviewer: then every upload waits for your click, which is a good last check before something permanent happens.
+
+### After the move to the Mezzframe org (do this before the next release)
+
+The repo moved from the maintainer's personal account (`Novapakt`) to the `Mezzframe` org after v0.1.0. GitHub redirects the old URLs, but PyPI's trusted publisher still expects the old owner, so the next upload would fail with `invalid-publisher`.
+
+1. On pypi.org, open **chromaverity → Settings → Publishing**.
+2. **Add** a GitHub publisher with the values in the table above (owner `Mezzframe`).
+3. Check the `pypi` environment still exists under the repo's **Settings → Environments** ⟨verify: environments should move with a transferred repo⟩.
+4. After the next release goes through, **remove** the old `Novapakt` publisher entry.
+
+Add first, remove last: that way there's never a moment with no working publisher.
 
 ## Cutting a release
 
@@ -56,7 +67,7 @@ On Windows PowerShell use a folder such as `$env:TEMP\cv-check` and `\Scripts\` 
 
 ## Troubleshooting
 
-**The upload step fails with `invalid-publisher`.** PyPI got the identity token but no trusted publisher matches it. Open the publisher entry on pypi.org (the pending publisher, or the project's **Settings → Publishing** once the project exists) and compare it with the table in the one-time setup: owner `Novapakt`, repository `chromaverity`, workflow `release.yml` (the file name only, not the path), environment `pypi`. They have to match exactly. Fix the entry, then re-run only the failed job; nothing was uploaded, so the version number is still free:
+**The upload step fails with `invalid-publisher`.** PyPI got the identity token but no trusted publisher matches it. Open the publisher entry on pypi.org (the pending publisher, or the project's **Settings → Publishing** once the project exists) and compare it with the table in the one-time setup: owner `Mezzframe`, repository `chromaverity`, workflow `release.yml` (the file name only, not the path), environment `pypi`. They have to match exactly. Fix the entry, then re-run only the failed job; nothing was uploaded, so the version number is still free:
 
 ```bash
 gh run rerun <run-id> --failed

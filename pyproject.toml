@@ -44,10 +44,10 @@ chromaverity = "chromaverity.cli:main"
 
 [project.urls]
 Homepage = "https://mezzframe.ai"
-Repository = "https://github.com/Novapakt/chromaverity"
-Documentation = "https://github.com/Novapakt/chromaverity/blob/main/docs/README.md"
-Issues = "https://github.com/Novapakt/chromaverity/issues"
-Changelog = "https://github.com/Novapakt/chromaverity/blob/main/CHANGELOG.md"
+Repository = "https://github.com/Mezzframe/chromaverity"
+Documentation = "https://github.com/Mezzframe/chromaverity/blob/main/docs/README.md"
+Issues = "https://github.com/Mezzframe/chromaverity/issues"
+Changelog = "https://github.com/Mezzframe/chromaverity/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling>=1.27"]

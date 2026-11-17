@@ -86,7 +86,7 @@ For the MCP server, install the extra instead: `pip install "chromaverity[mcp]"`
 On **macOS / Linux**:
 
 ```bash
-git clone https://github.com/Novapakt/chromaverity.git && cd chromaverity
+git clone https://github.com/Mezzframe/chromaverity.git && cd chromaverity
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,mcp]"
 python scripts/make_zoo.py samples      # build synthetic test clips with known mislabels
@@ -98,7 +98,7 @@ pytest                                  # the test suite; pure tests run even wi
 On **Windows** (PowerShell), only the setup lines differ. The `make_zoo`, `chromaverity` and `pytest` lines are the same:
 
 ```powershell
-git clone https://github.com/Novapakt/chromaverity.git; cd chromaverity
+git clone https://github.com/Mezzframe/chromaverity.git; cd chromaverity
 python -m venv .venv; .venv\Scripts\Activate.ps1
 pip install -e ".[dev,mcp]"
 ```

@@ -1,6 +1,6 @@
 # chromaverity docs
 
-These docs are written so that anyone on the project can explain what chromaverity does and why, to an engineer or to a stranger. If a doc can't help you explain something, that's a bug: [open an issue](https://github.com/Novapakt/chromaverity/issues) and say which doc.
+These docs are written so that anyone on the project can explain what chromaverity does and why, to an engineer or to a stranger. If a doc can't help you explain something, that's a bug: [open an issue](https://github.com/Mezzframe/chromaverity/issues) and say which doc.
 
 ## Reading paths
 

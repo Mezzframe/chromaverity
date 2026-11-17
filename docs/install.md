@@ -13,7 +13,7 @@ The maintainer works on macOS with Homebrew. Everything in this repo (setup, tes
 | Windows | Full test suite passes | Measured: CI on every push (`windows-latest`, FFmpeg 9.0 from gyan.dev via Chocolatey). CI runs the test suite in Git Bash, then runs the PowerShell and cmd lines from sections 3 and 4 below, as written. Not tested: Windows PowerShell 5.1 (CI uses PowerShell 7) |
 | Windows via WSL2 | Same as Linux ⟨assumption⟩ | WSL2 runs a real Ubuntu, so follow the Linux steps inside it |
 
-Found something that doesn't work on your system? Please [tell us](https://github.com/Novapakt/chromaverity/issues).
+Found something that doesn't work on your system? Please [tell us](https://github.com/Mezzframe/chromaverity/issues).
 
 ## 1. What you need
 
@@ -94,7 +94,7 @@ The commands are the same everywhere except the line that activates the virtual 
 **macOS / Linux / WSL (bash or zsh):**
 
 ```bash
-git clone https://github.com/Novapakt/chromaverity.git
+git clone https://github.com/Mezzframe/chromaverity.git
 cd chromaverity
 python3 -m venv .venv
 source .venv/bin/activate
@@ -104,7 +104,7 @@ pip install -e ".[dev,mcp]"
 **Windows PowerShell:**
 
 ```powershell
-git clone https://github.com/Novapakt/chromaverity.git
+git clone https://github.com/Mezzframe/chromaverity.git
 cd chromaverity
 python -m venv .venv
 .venv\Scripts\Activate.ps1
@@ -114,7 +114,7 @@ pip install -e ".[dev,mcp]"
 **Windows Command Prompt (cmd.exe):**
 
 ```bat
-git clone https://github.com/Novapakt/chromaverity.git
+git clone https://github.com/Mezzframe/chromaverity.git
 cd chromaverity
 python -m venv .venv
 .venv\Scripts\activate.bat

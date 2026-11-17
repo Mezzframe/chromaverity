@@ -9,7 +9,7 @@ Two different things live here: **developing** chromaverity with Claude Code, an
 These are the macOS / Linux commands. On Windows, see [install.md](install.md) for the PowerShell and cmd versions; only the venv lines differ.
 
 ```bash
-git clone https://github.com/Novapakt/chromaverity.git
+git clone https://github.com/Mezzframe/chromaverity.git
 cd chromaverity
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,mcp]"
