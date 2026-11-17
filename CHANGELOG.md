@@ -4,8 +4,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Added
+- `AI.md`: where AI helped build chromaverity, how agents use it, and what AI doesn't do here. Linked from a README badge.
+
 ### Changed
 - README quick start shows `pip install chromaverity` (plus FFmpeg) before the from-source steps.
+- README no longer says the repo is published from the maintainer's personal account; it lives in the Mezzframe org.
 - Release guide: wait for CI on `main` to finish green before `gh release create`, and a troubleshooting entry for PyPI's `invalid-publisher` error.
 
 ## [0.1.0] - 2026-10-14
